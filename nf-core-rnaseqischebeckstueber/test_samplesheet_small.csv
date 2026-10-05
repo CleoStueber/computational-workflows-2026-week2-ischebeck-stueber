@@ -1,0 +1,2 @@
+sample,fastq_1,fastq_2
+SRR23195516_test,test_data/SRR23195516_R1_test.fastq.gz,test_data/SRR23195516_R2_test.fastq.gz
