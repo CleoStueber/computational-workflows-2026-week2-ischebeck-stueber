@@ -32,7 +32,7 @@ workflow RNASEQISCHEBECKSTUEBER {
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
     //
-    // MODULE: Run FastQC
+    // MODULE: Run FastQC_RAW
     //
     FASTQC_RAW(ch_samplesheet)
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_RAW.out.zip.map{ _meta, file -> file })
@@ -49,6 +49,15 @@ workflow RNASEQISCHEBECKSTUEBER {
         false, // do not discard the successfully trimmed reads
         false, // do not save the failed fastp filtering reads
         false // do not merge paired ends R1 + R2
+    )
+
+    //
+    // MODULE: Run FastQC on trimmed reads
+    //
+    FASTQC_TRIMMED(FASTP.out.reads)
+
+    ch_multiqc_files = ch_multiqc_files.mix(
+        FASTQC_TRIMMED.out.zip.map { _meta, file -> file }
     )
 
     //
