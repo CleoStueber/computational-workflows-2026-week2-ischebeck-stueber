@@ -3,7 +3,9 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { FASTQC                 } from '../modules/nf-core/fastqc/main'
+include { FASTQC as FASTQC_RAW   } from '../modules/nf-core/fastqc/main'
+include { FASTQC as FASTQC_TRIMMED  } from '../modules/nf-core/fastqc/main'
+include { FASTP                  } from '../modules/nf-core/fastp/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -32,8 +34,22 @@ workflow RNASEQISCHEBECKSTUEBER {
     //
     // MODULE: Run FastQC
     //
-    FASTQC(ch_samplesheet)
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map{ _meta, file -> file })
+    FASTQC_RAW(ch_samplesheet)
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_RAW.out.zip.map{ _meta, file -> file })
+
+    //
+    // MODULE: Trim reads with fastp
+    //
+    ch_fastp_input = ch_samplesheet.map { meta, reads ->
+        [meta, reads, []]
+    }
+
+    FASTP(
+        ch_fastp_input,
+        false, // do not discard the successfully trimmed reads
+        false, // do not save the failed fastp filtering reads
+        false // do not merge paired ends R1 + R2
+    )
 
     //
     // Collate and save software versions
