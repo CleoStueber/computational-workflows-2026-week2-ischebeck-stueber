@@ -1,4 +1,5 @@
 .DS_Store
+.nextflow*.log
 fetchngs_out/
 rnaseq_out_allsamples/
 /computational_workflows_project_2026.pdf

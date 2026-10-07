@@ -30,6 +30,7 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_rnas
 //   This is an example of how to use getGenomeAttribute() to fetch parameters
 //   from igenomes.config using `--genome`
 params.fasta = getGenomeAttribute('fasta')
+params.gtf   = getGenomeAttribute('gtf') // added
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,6 +47,8 @@ workflow NFCORE_RNASEQISCHEBECKSTUEBER {
     samplesheet // channel: samplesheet read in from --input
 
     main:
+    ch_genome_fasta = channel.value(file(params.fasta, checkIfExists: true))
+    ch_gtf          = channel.value(file(params.gtf, checkIfExists: true))
 
     //
     // WORKFLOW: Run pipeline
@@ -55,7 +58,9 @@ workflow NFCORE_RNASEQISCHEBECKSTUEBER {
         params.multiqc_config,
         params.multiqc_logo,
         params.multiqc_methods_description,
-        params.outdir,
+        params.outdir, 
+        ch_genome_fasta, // added
+        ch_gtf // added
     )
     emit:
     multiqc_report = RNASEQISCHEBECKSTUEBER.out.multiqc_report // channel: /path/to/multiqc_report.html

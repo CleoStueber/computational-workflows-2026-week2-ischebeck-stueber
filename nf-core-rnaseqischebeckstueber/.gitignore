@@ -1,10 +1,15 @@
+.nextflow
 .nextflow*
 work/
 data/
 results/
+test_data/
+test_results/
+test_results_small/
 .DS_Store
 testing/
 testing*
 *.pyc
 null/
 .lineage/
+references/*.gz
