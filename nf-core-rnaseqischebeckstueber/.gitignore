@@ -13,3 +13,4 @@ testing*
 null/
 .lineage/
 references/*.gz
+final_test_results/

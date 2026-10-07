@@ -6,9 +6,10 @@
 include { FASTQC as FASTQC_RAW }        from '../modules/nf-core/fastqc/main'
 include { FASTQC as FASTQC_TRIMMED }    from '../modules/nf-core/fastqc/main'
 include { FASTP }                       from '../modules/nf-core/fastp/main'
-include { GFFREAD }                     from '../modules/nf-core/gffread/main' // added
-include { SALMON_INDEX }                from '../modules/nf-core/salmon/index/main' // added
-include { SALMON_QUANT }                from '../modules/nf-core/salmon/quant/main' // added
+include { FILTER_GTF }                  from '../modules/nf-core/local/filtergtf/main'
+include { GFFREAD }                     from '../modules/nf-core/gffread/main' 
+include { SALMON_INDEX }                from '../modules/nf-core/salmon/index/main' 
+include { SALMON_QUANT }                from '../modules/nf-core/salmon/quant/main'
 include { MULTIQC }                     from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap }            from 'plugin/nf-schema'
 include { paramsSummaryMultiqc }        from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -56,6 +57,10 @@ workflow RNASEQISCHEBECKSTUEBER {
         false // do not merge paired ends R1 + R2
     )
 
+    ch_multiqc_files = ch_multiqc_files.mix(
+        FASTP.out.json.map { _meta, file -> file }
+    )
+
     //
     // MODULE: Run FastQC on trimmed reads
     //
@@ -66,9 +71,19 @@ workflow RNASEQISCHEBECKSTUEBER {
     )
 
     //
+    // MODULE: Filter GTF to contigs present in genome FASTA
+    //
+    FILTER_GTF(
+        gtf,
+        genome_fasta
+    )
+
+    ch_filtered_gtf = FILTER_GTF.out.filtered_gtf
+
+    //
     // MODULE: Generate transcript FASTA from genome FASTA + GTF
     //
-    ch_gffread_input = gtf.map { gtf_file ->
+    ch_gffread_input = ch_filtered_gtf.map { gtf_file ->
         tuple([id: 'reference'], gtf_file)
     }
 
@@ -80,10 +95,16 @@ workflow RNASEQISCHEBECKSTUEBER {
     //
     // MODULE: Build Salmon index
     //
-    ch_salmon_index_input = GFFREAD.out.gffread_fasta
+    ch_transcript_fasta = GFFREAD.out.gffread_fasta
+        .map { meta, transcript_fasta ->
+            transcript_fasta
+        }
+        .first()
+
+    ch_salmon_index_input = ch_transcript_fasta
         .combine(genome_fasta)
-        .map { meta, transcript_fasta, genome_file ->
-            tuple(meta, transcript_fasta, genome_file)
+        .map { transcript_fasta, genome_file ->
+            tuple([id: 'reference'], transcript_fasta, genome_file)
         }
 
     SALMON_INDEX(ch_salmon_index_input)
@@ -92,9 +113,10 @@ workflow RNASEQISCHEBECKSTUEBER {
     // MODULE: Quantify transcripts with Salmon
     //
     ch_salmon_quant_reference = SALMON_INDEX.out.index
-        .combine(gtf)
-        .map { meta, index, gtf_file ->
-            tuple(meta, index, gtf_file, [])
+        .combine(ch_filtered_gtf)
+        .combine(ch_transcript_fasta)
+        .map { meta, index, gtf_file, transcript_fasta ->
+            tuple(meta, index, gtf_file, transcript_fasta)
         }
         .first()
 
