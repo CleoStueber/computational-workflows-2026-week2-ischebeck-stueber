@@ -3,14 +3,17 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { FASTQC as FASTQC_RAW   } from '../modules/nf-core/fastqc/main'
-include { FASTQC as FASTQC_TRIMMED  } from '../modules/nf-core/fastqc/main'
-include { FASTP                  } from '../modules/nf-core/fastp/main'
-include { MULTIQC                } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap       } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_rnaseqischebeckstueber_pipeline'
+include { FASTQC as FASTQC_RAW }        from '../modules/nf-core/fastqc/main'
+include { FASTQC as FASTQC_TRIMMED }    from '../modules/nf-core/fastqc/main'
+include { FASTP }                       from '../modules/nf-core/fastp/main'
+include { GFFREAD }                     from '../modules/nf-core/gffread/main' // added
+include { SALMON_INDEX }                from '../modules/nf-core/salmon/index/main' // added
+include { SALMON_QUANT }                from '../modules/nf-core/salmon/quant/main' // added
+include { MULTIQC }                     from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap }            from 'plugin/nf-schema'
+include { paramsSummaryMultiqc }        from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML }      from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText }      from '../subworkflows/local/utils_nfcore_rnaseqischebeckstueber_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,6 +29,8 @@ workflow RNASEQISCHEBECKSTUEBER {
     multiqc_logo
     multiqc_methods_description
     outdir
+    genome_fasta // added
+    gtf // added
 
     main:
 
@@ -60,6 +65,52 @@ workflow RNASEQISCHEBECKSTUEBER {
         FASTQC_TRIMMED.out.zip.map { _meta, file -> file }
     )
 
+    //
+    // MODULE: Generate transcript FASTA from genome FASTA + GTF
+    //
+    ch_gffread_input = gtf.map { gtf_file ->
+        tuple([id: 'reference'], gtf_file)
+    }
+
+    GFFREAD(
+        ch_gffread_input,
+        genome_fasta
+    )
+
+    //
+    // MODULE: Build Salmon index
+    //
+    ch_salmon_index_input = GFFREAD.out.gffread_fasta
+        .combine(genome_fasta)
+        .map { meta, transcript_fasta, genome_file ->
+            tuple(meta, transcript_fasta, genome_file)
+        }
+
+    SALMON_INDEX(ch_salmon_index_input)
+
+    //
+    // MODULE: Quantify transcripts with Salmon
+    //
+    ch_salmon_quant_reference = SALMON_INDEX.out.index
+        .combine(gtf)
+        .map { meta, index, gtf_file ->
+            tuple(meta, index, gtf_file, [])
+        }
+        .first()
+
+    SALMON_QUANT(
+        FASTP.out.reads,
+        ch_salmon_quant_reference
+    )
+
+    ch_multiqc_files = ch_multiqc_files.mix(
+        SALMON_QUANT.out.json_info.map { _meta, file -> file }
+    )
+
+    ch_multiqc_files = ch_multiqc_files.mix(
+        SALMON_QUANT.out.lib_format_counts.map { _meta, file -> file }
+    )
+    
     //
     // Collate and save software versions
     //
