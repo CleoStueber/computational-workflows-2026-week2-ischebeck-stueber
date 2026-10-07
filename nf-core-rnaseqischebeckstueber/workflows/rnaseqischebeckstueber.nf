@@ -6,10 +6,12 @@
 include { FASTQC as FASTQC_RAW }        from '../modules/nf-core/fastqc/main'
 include { FASTQC as FASTQC_TRIMMED }    from '../modules/nf-core/fastqc/main'
 include { FASTP }                       from '../modules/nf-core/fastp/main'
-include { FILTER_GTF }                  from '../modules/nf-core/local/filtergtf/main'
+include { FILTER_GTF }                  from '../modules/local/filtergtf/main'
 include { GFFREAD }                     from '../modules/nf-core/gffread/main' 
 include { SALMON_INDEX }                from '../modules/nf-core/salmon/index/main' 
 include { SALMON_QUANT }                from '../modules/nf-core/salmon/quant/main'
+include { CUSTOM_TX2GENE }              from '../modules/nf-core/custom/tx2gene/main'
+include { TXIMETA_TXIMPORT }            from '../modules/nf-core/tximeta/tximport/main'
 include { MULTIQC }                     from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap }            from 'plugin/nf-schema'
 include { paramsSummaryMultiqc }        from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -99,7 +101,7 @@ workflow RNASEQISCHEBECKSTUEBER {
         .map { meta, transcript_fasta ->
             transcript_fasta
         }
-        .first()
+        
 
     ch_salmon_index_input = ch_transcript_fasta
         .combine(genome_fasta)
@@ -131,6 +133,41 @@ workflow RNASEQISCHEBECKSTUEBER {
 
     ch_multiqc_files = ch_multiqc_files.mix(
         SALMON_QUANT.out.lib_format_counts.map { _meta, file -> file }
+    )
+    
+    //
+    // MODULE: Create transcript-to-gene mapping
+    //
+    ch_tx2gene_gtf = ch_filtered_gtf.map { gtf_file ->  // take filtered GTF file and attach metadata 
+        tuple([id: 'reference'], gtf_file)              // CUSTOM_TX2GENE expects tuple: [meta, gtf_file]
+    }
+
+    ch_first_salmon_result = SALMON_QUANT.out.results.first() // SALMON_QUANT produces 1 result/sample; CUSTOM_TX2GENE needs 1 Salmon result to check/match transcript IDs
+
+    CUSTOM_TX2GENE(             // create transcript-to-gene mapping table
+        ch_tx2gene_gtf,         // filtered GTF
+        ch_first_salmon_result, // 1 Salmon result
+        'salmon',               // quantification type = salmon
+        'gene_id',              // GTF attribute used for gene ID
+        'gene_name'             // GTF attribute used for gene name
+    )
+
+    //
+    // MODULE: Import Salmon results with tximport
+    //
+    ch_salmon_quants = SALMON_QUANT.out.results // SALMON_QUANT.out.results contains:[meta, salmon_result]; remove metadata, keep only Salmon result for each sample
+        .map { meta, results ->
+            results
+        }
+        .collect()                              // collect all sample-wise Salmon results into list; tximport needs all samples together to build combined matrix
+        .map { results ->                       // add metadata required by TXIMETA_TXIMPORT module
+            tuple([id: 'salmon'], results)
+        }
+
+    TXIMETA_TXIMPORT(               // run tximport
+        ch_salmon_quants,           // all Salmon quantification results
+        CUSTOM_TX2GENE.out.tx2gene, // transcript-to-gene mapping from CUSTOM_TX2GENE
+        'salmon'                    // quantification type = salmon
     )
     
     //
@@ -188,8 +225,14 @@ workflow RNASEQISCHEBECKSTUEBER {
             ]
         }
     )
-    emit:multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
-    versions       = ch_versions                 // channel: [ path(versions.yml) ]
+
+    emit:
+        multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
+        gene_counts    = TXIMETA_TXIMPORT.out.counts_gene
+        gene_tpm       = TXIMETA_TXIMPORT.out.tpm_gene
+        gene_lengths   = TXIMETA_TXIMPORT.out.lengths_gene
+        
+        versions       = ch_versions                 // channel: [ path(versions.yml) ]
 }
 
 /*

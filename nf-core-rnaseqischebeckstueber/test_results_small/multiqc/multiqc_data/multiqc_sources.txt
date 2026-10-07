@@ -1,3 +1,0 @@
-Module	Section	Sample Name	Source
-FastQC	all_sections	SRR23195516_test_1	/Users/cleostuber/computational-workflows-2026-week2-ischebeck-stueber/nf-core-rnaseqischebeckstueber/work/0b/c122c02a2dc3d323e77d0d292be3aa/3/SRR23195516_test_1_fastqc.zip
-FastQC	all_sections	SRR23195516_test_2	/Users/cleostuber/computational-workflows-2026-week2-ischebeck-stueber/nf-core-rnaseqischebeckstueber/work/0b/c122c02a2dc3d323e77d0d292be3aa/4/SRR23195516_test_2_fastqc.zip
