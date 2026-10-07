@@ -30,8 +30,8 @@ workflow RNASEQISCHEBECKSTUEBER {
     multiqc_logo
     multiqc_methods_description
     outdir
-    genome_fasta // added
-    gtf // added
+    genome_fasta
+    gtf 
 
     main:
 
