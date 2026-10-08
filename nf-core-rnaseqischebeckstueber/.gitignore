@@ -4,7 +4,7 @@ work/
 data/
 results/
 test_data/
-test_results/
+test_results*/
 test_results_small/
 .DS_Store
 testing/

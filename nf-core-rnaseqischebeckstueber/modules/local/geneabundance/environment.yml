@@ -7,3 +7,4 @@ dependencies:
   - conda-forge::bash=5.2
   - conda-forge::coreutils=9.5
   - conda-forge::sed=4.9
+  - conda-forge::gawk=5.3.0

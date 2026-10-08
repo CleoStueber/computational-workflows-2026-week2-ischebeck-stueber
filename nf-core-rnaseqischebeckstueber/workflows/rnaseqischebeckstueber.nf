@@ -9,6 +9,7 @@ include { FASTP }                       from '../modules/nf-core/fastp/main'
 include { RIBODETECTOR }                from '../modules/nf-core/ribodetector/main'
 include { FASTQC as FASTQC_FILTERED }   from '../modules/nf-core/fastqc/main'
 include { FASTQ_SUBSAMPLE_FQ_SALMON }   from '../subworkflows/nf-core/fastq_subsample_fq_salmon/main'
+include { PREPARE_FASTQC_MULTIQC }      from '../modules/local/prepare_fastqc_multiqc/main'
 include { FILTER_GTF }                  from '../modules/local/filtergtf/main'
 include { GFFREAD }                     from '../modules/nf-core/gffread/main' 
 include { SALMON_INDEX }                from '../modules/nf-core/salmon/index/main' 
@@ -48,7 +49,6 @@ workflow RNASEQISCHEBECKSTUEBER {
     // MODULE: Run FastQC_RAW
     //
     FASTQC_RAW(ch_samplesheet)
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_RAW.out.zip.map{ _meta, file -> file })
 
     //
     // MODULE: Trim reads with fastp
@@ -73,10 +73,6 @@ workflow RNASEQISCHEBECKSTUEBER {
     //
     FASTQC_TRIMMED(FASTP.out.reads)
 
-    ch_multiqc_files = ch_multiqc_files.mix(
-        FASTQC_TRIMMED.out.zip.map { _meta, file -> file }
-    )
-
     //
     // MODULE: RiboDetector removes rRNA from trimmed reads
     //
@@ -97,8 +93,22 @@ workflow RNASEQISCHEBECKSTUEBER {
     // FastQC: quality control after rRNA removal
     FASTQC_FILTERED(RIBODETECTOR.out.fastq)
 
+    ch_fastqc_multiqc = FASTQC_RAW.out.zip.map { meta, file ->
+        tuple(meta, 'raw', file)
+    }.mix(
+        FASTQC_TRIMMED.out.zip.map { meta, file ->
+            tuple(meta, 'trimmed', file)
+        }
+    ).mix(
+        FASTQC_FILTERED.out.zip.map { meta, file ->
+            tuple(meta, 'filtered', file)
+        }
+    )
+
+    PREPARE_FASTQC_MULTIQC(ch_fastqc_multiqc)
+
     ch_multiqc_files = ch_multiqc_files.mix(
-        FASTQC_FILTERED.out.zip.map { _meta, file -> file }
+        PREPARE_FASTQC_MULTIQC.out.reports
     )
 
     //
@@ -289,8 +299,7 @@ workflow RNASEQISCHEBECKSTUEBER {
         gene_counts    = TXIMETA_TXIMPORT.out.counts_gene
         gene_tpm       = TXIMETA_TXIMPORT.out.tpm_gene
         gene_lengths   = TXIMETA_TXIMPORT.out.lengths_gene
-        
-        versions       = ch_versions                 // channel: [ path(versions.yml) ]
+        versions       = topic_versions.versions_file
 }
 
 /*

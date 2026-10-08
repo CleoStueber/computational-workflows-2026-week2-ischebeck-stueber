@@ -16,3 +16,5 @@ disable_version_detection: true
 
 dirs: true
 dirs_depth: 1
+
+fn_clean_sample_names: false
