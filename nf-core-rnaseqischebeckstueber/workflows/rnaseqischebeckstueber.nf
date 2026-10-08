@@ -12,6 +12,7 @@ include { SALMON_INDEX }                from '../modules/nf-core/salmon/index/ma
 include { SALMON_QUANT }                from '../modules/nf-core/salmon/quant/main'
 include { CUSTOM_TX2GENE }              from '../modules/nf-core/custom/tx2gene/main'
 include { TXIMETA_TXIMPORT }            from '../modules/nf-core/tximeta/tximport/main'
+include { GENE_ABUNDANCE }              from '../modules/local/geneabundance/main'
 include { MULTIQC }                     from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap }            from 'plugin/nf-schema'
 include { paramsSummaryMultiqc }        from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -169,7 +170,13 @@ workflow RNASEQISCHEBECKSTUEBER {
         CUSTOM_TX2GENE.out.tx2gene, // transcript-to-gene mapping from CUSTOM_TX2GENE
         'salmon'                    // quantification type = salmon
     )
-    
+
+    GENE_ABUNDANCE(TXIMETA_TXIMPORT.out.tpm_gene)
+
+    ch_multiqc_files = ch_multiqc_files.mix(
+        GENE_ABUNDANCE.out
+    )
+        
     //
     // Collate and save software versions
     //
