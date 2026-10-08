@@ -1,6 +1,11 @@
 process FILTER_GTF {
     tag "reference"
 
+    conda "${moduleDir}/environment.yml"
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/gawk:5.3.0' :
+        'quay.io/biocontainers/gawk:5.3.0' }"
+    
     input:
     path gtf
     path fasta

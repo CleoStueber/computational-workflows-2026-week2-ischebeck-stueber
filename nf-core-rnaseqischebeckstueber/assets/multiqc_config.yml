@@ -13,3 +13,6 @@ report_section_order:
 export_plots: true
 
 disable_version_detection: true
+
+dirs: true
+dirs_depth: 1
