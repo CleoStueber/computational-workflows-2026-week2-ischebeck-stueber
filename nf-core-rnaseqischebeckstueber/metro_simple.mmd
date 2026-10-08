@@ -1,0 +1,47 @@
+
+%%metro title: nf-core/rnaseqischebeckstueber
+%%metro style: dark
+%%metro line_order: definition
+%%metro line: preprocessing | Read Processing | #3498db
+%%metro line: reference | Reference Preparation | #9b59b6
+%%metro line: quantification | Quantification | #2db572
+%%metro line: reporting | Reporting | #f39c12
+
+graph LR
+    fastqc_raw([FASTQC_RAW])
+    fastp([FASTP])
+    fastqc_trimmed([FASTQC_TRIMMED])
+    ribodetector([RIBODETECTOR])
+    fastqc_filtered([FASTQC_FILTERED])
+
+    filter_gtf([FILTER_GTF])
+    gffread([GFFREAD])
+    salmon_index([SALMON_INDEX])
+
+    fq_subsample([FQ_SUBSAMPLE])
+    salmon_inference([SALMON_STRANDNESS])
+    salmon_quant([SALMON_QUANT])
+
+    custom_tx2gene([CUSTOM_TX2GENE])
+    tximport([TXIMETA_TXIMPORT])
+    gene_abundance([GENE_ABUNDANCE])
+    multiqc([MULTIQC])
+
+    fastqc_raw -->|preprocessing| fastp
+    fastp -->|preprocessing| fastqc_trimmed
+    fastqc_trimmed -->|preprocessing| ribodetector
+    ribodetector -->|preprocessing| fastqc_filtered
+
+    filter_gtf -->|reference| gffread
+    gffread -->|reference| salmon_index
+
+    fq_subsample -->|quantification| salmon_inference
+    salmon_inference -->|quantification| salmon_quant
+    salmon_index -->|quantification| salmon_quant
+    ribodetector -->|quantification| salmon_quant
+
+    salmon_quant -->|quantification| custom_tx2gene
+    custom_tx2gene -->|quantification| tximport
+    tximport -->|quantification| gene_abundance
+
+    gene_abundance -->|reporting| multiqc
