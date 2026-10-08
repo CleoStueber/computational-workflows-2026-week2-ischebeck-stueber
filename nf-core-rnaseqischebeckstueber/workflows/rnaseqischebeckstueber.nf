@@ -6,6 +6,9 @@
 include { FASTQC as FASTQC_RAW }        from '../modules/nf-core/fastqc/main'
 include { FASTQC as FASTQC_TRIMMED }    from '../modules/nf-core/fastqc/main'
 include { FASTP }                       from '../modules/nf-core/fastp/main'
+include { RIBODETECTOR }                from '../modules/nf-core/ribodetector/main'
+include { FASTQC as FASTQC_FILTERED }   from '../modules/nf-core/fastqc/main'
+include { FASTQ_SUBSAMPLE_FQ_SALMON }   from '../subworkflows/nf-core/fastq_subsample_fq_salmon/main'
 include { FILTER_GTF }                  from '../modules/local/filtergtf/main'
 include { GFFREAD }                     from '../modules/nf-core/gffread/main' 
 include { SALMON_INDEX }                from '../modules/nf-core/salmon/index/main' 
@@ -17,7 +20,7 @@ include { MULTIQC }                     from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap }            from 'plugin/nf-schema'
 include { paramsSummaryMultiqc }        from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML }      from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText }      from '../subworkflows/local/utils_nfcore_rnaseqischebeckstueber_pipeline'
+include { methodsDescriptionText; inferStrandedness } from '../subworkflows/local/utils_nfcore_rnaseqischebeckstueber_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,6 +43,7 @@ workflow RNASEQISCHEBECKSTUEBER {
 
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
+    // ---------------------------- PREPROCESSING ----------------------------
     //
     // MODULE: Run FastQC_RAW
     //
@@ -71,6 +75,30 @@ workflow RNASEQISCHEBECKSTUEBER {
 
     ch_multiqc_files = ch_multiqc_files.mix(
         FASTQC_TRIMMED.out.zip.map { _meta, file -> file }
+    )
+
+    //
+    // MODULE: RiboDetector removes rRNA from trimmed reads
+    //
+    ch_ribo_input = FASTP.out.reads
+        .join(FASTP.out.json, failOnMismatch: true, failOnDuplicate: true)
+        .map { meta, reads, json ->
+            def stats = new groovy.json.JsonSlurper()
+                .parseText(json.text).summary.after_filtering
+
+            def lengths = [stats.read1_mean_length, stats.read2_mean_length]
+                .findAll { it != null }
+
+            tuple(meta, reads, Math.round(lengths.sum() / lengths.size()) as int)
+        }
+
+    RIBODETECTOR(ch_ribo_input) // CHANGED INPUT!!!! [meta, trimmed FASTQ files, calculated mean read length]
+
+    // FastQC: quality control after rRNA removal
+    FASTQC_FILTERED(RIBODETECTOR.out.fastq)
+
+    ch_multiqc_files = ch_multiqc_files.mix(
+        FASTQC_FILTERED.out.zip.map { _meta, file -> file }
     )
 
     //
@@ -113,6 +141,27 @@ workflow RNASEQISCHEBECKSTUEBER {
     SALMON_INDEX(ch_salmon_index_input)
 
     //
+    // SUBWORKFLOW: Infer strandedness using raw FASTQ reads
+    //
+    ch_index_for_inference = SALMON_INDEX.out.index
+        .map { meta, index -> index }
+
+    FASTQ_SUBSAMPLE_FQ_SALMON(
+        ch_samplesheet,
+        genome_fasta,
+        ch_transcript_fasta,
+        ch_filtered_gtf,
+        ch_index_for_inference,
+        false
+    )
+
+    ch_stranded_reads = FASTQ_SUBSAMPLE_FQ_SALMON.out.lib_format_counts
+        .join(RIBODETECTOR.out.fastq, failOnMismatch: true, failOnDuplicate: true)
+        .map { meta, json, reads ->
+            tuple(meta + [strandedness: inferStrandedness(json)], reads)
+        }
+    
+    //
     // MODULE: Quantify transcripts with Salmon
     //
     ch_salmon_quant_reference = SALMON_INDEX.out.index
@@ -124,7 +173,7 @@ workflow RNASEQISCHEBECKSTUEBER {
         .first()
 
     SALMON_QUANT(
-        FASTP.out.reads,
+        ch_stranded_reads,
         ch_salmon_quant_reference
     )
 
@@ -172,6 +221,8 @@ workflow RNASEQISCHEBECKSTUEBER {
     )
 
     GENE_ABUNDANCE(TXIMETA_TXIMPORT.out.tpm_gene)
+
+    // DE Seq 2 PCA
 
     ch_multiqc_files = ch_multiqc_files.mix(
         GENE_ABUNDANCE.out

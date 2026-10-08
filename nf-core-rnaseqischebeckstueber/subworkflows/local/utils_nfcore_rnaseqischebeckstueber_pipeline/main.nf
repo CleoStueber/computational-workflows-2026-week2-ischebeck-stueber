@@ -294,3 +294,24 @@ def methodsDescriptionText(mqc_methods_yaml) {
 
     return description_html.toString()
 }
+
+//
+// Infer library strandedness from Salmon output
+//
+def inferStrandedness(json_file) {
+    def counts = new groovy.json.JsonSlurper().parseText(json_file.text)
+
+    def forward = ['SF', 'ISF', 'MSF', 'OSF'].sum { counts[it] ?: 0 } as double
+    def reverse = ['SR', 'ISR', 'MSR', 'OSR'].sum { counts[it] ?: 0 } as double
+
+    def total = forward + reverse
+    if (total == 0) return 'undetermined'
+
+    def fraction = forward / total
+
+    if (fraction >= 0.8) return 'forward'
+    if (fraction <= 0.2) return 'reverse'
+    if (Math.abs(fraction - 0.5) <= 0.05) return 'unstranded'
+
+    return 'undetermined'
+}

@@ -1,0 +1,24 @@
+Changes in component 'nf-core/ribodetector'
+'modules/nf-core/ribodetector/environment.yml' is unchanged
+'modules/nf-core/ribodetector/meta.yml' is unchanged
+Changes in 'ribodetector/main.nf':
+--- modules/nf-core/ribodetector/main.nf
++++ modules/nf-core/ribodetector/main.nf
+@@ -8,8 +8,7 @@
+         (task.accelerator ? 'community.wave.seqera.io/library/ribodetector_pytorch-gpu_cuda-version:fa9183da731515ea' : 'community.wave.seqera.io/library/ribodetector:0.3.3--ad3d7071e408b502') }"
+ 
+ 	input:
+-	tuple val(meta), path(fastq)
+-	val length
++	tuple val(meta), path(fastq), val (length)
+ 
+ 	output:
+ 	tuple val(meta), path("*.nonrna*.fastq.gz"), emit: fastq
+
+'modules/nf-core/ribodetector/environment.gpu.yml' is unchanged
+'modules/nf-core/ribodetector/tests/nextflow.gpu.config' is unchanged
+'modules/nf-core/ribodetector/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/ribodetector/tests/main.gpu.nf.test' is unchanged
+'modules/nf-core/ribodetector/tests/main.gpu.nf.test.snap' is unchanged
+'modules/nf-core/ribodetector/tests/main.nf.test' is unchanged
+************************************************************

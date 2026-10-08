@@ -10,6 +10,11 @@
                         "git_sha": "1a6066c338c5b345115b953d3c03e8de2cb63f78",
                         "installed_by": ["modules"]
                     },
+                    "deseq2/differential": {
+                        "branch": "master",
+                        "git_sha": "103e34a7c2eb5d2862f97c6225793ddad6f4e0bd",
+                        "installed_by": ["modules"]
+                    },
                     "fastp": {
                         "branch": "master",
                         "git_sha": "826a9b28d6da61097d60e1923bb8a2e51de3c5b4",
@@ -19,6 +24,11 @@
                         "branch": "master",
                         "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
                         "installed_by": ["modules"]
+                    },
+                    "fq/subsample": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["fastq_subsample_fq_salmon"]
                     },
                     "gffread": {
                         "branch": "master",
@@ -30,14 +40,25 @@
                         "git_sha": "98403d15b0e50edae1f3fec5eae5e24982f1fade",
                         "installed_by": ["modules"]
                     },
+                    "ribodetector": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/ribodetector/ribodetector.diff"
+                    },
                     "salmon/index": {
                         "branch": "master",
                         "git_sha": "53daf6285b9fbf1164b4dcab41da6e70e1f2f721",
-                        "installed_by": ["modules"]
+                        "installed_by": ["fastq_subsample_fq_salmon", "modules"]
                     },
                     "salmon/quant": {
                         "branch": "master",
                         "git_sha": "225ce36098d83f8c355c4bb8684f8205350c288e",
+                        "installed_by": ["fastq_subsample_fq_salmon", "modules"]
+                    },
+                    "shinyngs/staticexploratory": {
+                        "branch": "master",
+                        "git_sha": "c565f1b27c06a1e8b726e2a646d4c822ae3b514a",
                         "installed_by": ["modules"]
                     },
                     "tximeta/tximport": {
@@ -49,6 +70,11 @@
             },
             "subworkflows": {
                 "nf-core": {
+                    "fastq_subsample_fq_salmon": {
+                        "branch": "master",
+                        "git_sha": "81b7daa6a899de586f7492dee5eef68d4419635d",
+                        "installed_by": ["subworkflows"]
+                    },
                     "utils_nextflow_pipeline": {
                         "branch": "master",
                         "git_sha": "c2b22d85f30a706a3073387f30380704fcae013b",

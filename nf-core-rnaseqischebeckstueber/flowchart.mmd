@@ -1,0 +1,198 @@
+flowchart TB
+    subgraph " "
+    v0["channel.empty"]
+    v2["channel.fromList"]
+    v7["channel.empty"]
+    v8["channel.empty"]
+    v15["discard_trimmed_pass"]
+    v16["save_trimmed_fail"]
+    v17["save_merged"]
+    v42["ch_genome_fasta"]
+    v43["gtf"]
+    v81["quant_type"]
+    v82["id"]
+    v83["extra"]
+    v89["quant_type"]
+    v102[" "]
+    v112["channel.of"]
+    v117[" "]
+    v120[" "]
+    end
+    subgraph " "
+    v1["versions"]
+    v10[" "]
+    v11[" "]
+    v19[" "]
+    v20[" "]
+    v21[" "]
+    v22[" "]
+    v23[" "]
+    v27[" "]
+    v28[" "]
+    v34[" "]
+    v35[" "]
+    v36[" "]
+    v38[" "]
+    v39[" "]
+    v47[" "]
+    v48[" "]
+    v49[" "]
+    v50[" "]
+    v55[" "]
+    v60[" "]
+    v64[" "]
+    v65["json_info"]
+    v66["results"]
+    v74[" "]
+    v85[" "]
+    v91[" "]
+    v92[" "]
+    v93[" "]
+    v94[" "]
+    v95[" "]
+    v96["gene_lengths"]
+    v97[" "]
+    v98[" "]
+    v99["gene_counts"]
+    v127[" "]
+    v128[" "]
+    v129[" "]
+    v133[" "]
+    end
+    subgraph "NFCORE_RNASEQISCHEBECKSTUEBER [NFCORE_RNASEQISCHEBECKSTUEBER]"
+    subgraph "NFCORE_RNASEQISCHEBECKSTUEBER:RNASEQISCHEBECKSTUEBER [RNASEQISCHEBECKSTUEBER]"
+    v9(["FASTQC_RAW"])
+    v18(["FASTP"])
+    v26(["FASTQC_TRIMMED"])
+    v33(["RIBODETECTOR"])
+    v37(["FASTQC_FILTERED"])
+    v44(["FILTER_GTF"])
+    v46(["GFFREAD"])
+    v54(["SALMON_INDEX"])
+    subgraph "NFCORE_RNASEQISCHEBECKSTUEBER:RNASEQISCHEBECKSTUEBER:FASTQ_SUBSAMPLE_FQ_SALMON [FASTQ_SUBSAMPLE_FQ_SALMON]"
+    v59(["FQ_SUBSAMPLE"])
+    v63(["SALMON_QUANT"])
+    v57(( ))
+    end
+    v73(["SALMON_QUANT"])
+    v84(["CUSTOM_TX2GENE"])
+    v90(["TXIMETA_TXIMPORT"])
+    v100(["GENE_ABUNDANCE"])
+    v126(["MULTIQC"])
+    v12(( ))
+    v14(( ))
+    v31(( ))
+    v45(( ))
+    v51(( ))
+    v56(( ))
+    v67(( ))
+    v79(( ))
+    v80(( ))
+    v86(( ))
+    v130(( ))
+    end
+    end
+    subgraph "PIPELINE_INITIALISATION [PIPELINE_INITIALISATION]"
+    v3(( ))
+    end
+    subgraph "PIPELINE_COMPLETION [PIPELINE_COMPLETION]"
+    v132(( ))
+    end
+    v0 --> v1
+    v2 --> v3
+    v7 --> v12
+    v8 --> v12
+    v3 --> v9
+    v9 --> v11
+    v9 --> v10
+    v9 --> v12
+    v15 --> v18
+    v16 --> v18
+    v17 --> v18
+    v14 --> v18
+    v18 --> v26
+    v18 --> v23
+    v18 --> v22
+    v18 --> v21
+    v18 --> v20
+    v18 --> v19
+    v18 --> v12
+    v18 --> v31
+    v26 --> v28
+    v26 --> v27
+    v26 --> v12
+    v31 --> v33
+    v33 --> v37
+    v33 --> v36
+    v33 --> v35
+    v33 --> v34
+    v33 --> v67
+    v37 --> v39
+    v37 --> v38
+    v37 --> v12
+    v42 --> v44
+    v42 --> v46
+    v42 --> v51
+    v43 --> v44
+    v44 --> v45
+    v44 --> v51
+    v44 --> v57
+    v44 --> v79
+    v45 --> v46
+    v46 --> v50
+    v46 --> v49
+    v46 --> v48
+    v46 --> v47
+    v46 --> v51
+    v51 --> v54
+    v54 --> v55
+    v54 --> v51
+    v54 --> v56
+    v3 --> v59
+    v59 --> v63
+    v59 --> v60
+    v57 --> v63
+    v63 --> v66
+    v63 --> v65
+    v63 --> v64
+    v63 --> v67
+    v51 --> v73
+    v67 --> v73
+    v73 --> v74
+    v73 --> v12
+    v73 --> v80
+    v73 --> v86
+    v81 --> v84
+    v82 --> v84
+    v83 --> v84
+    v79 --> v84
+    v80 --> v84
+    v84 --> v90
+    v84 --> v85
+    v89 --> v90
+    v86 --> v90
+    v90 --> v100
+    v90 --> v99
+    v90 --> v98
+    v90 --> v97
+    v90 --> v96
+    v90 --> v95
+    v90 --> v94
+    v90 --> v93
+    v90 --> v92
+    v90 --> v91
+    v100 --> v12
+    v102 --> v12
+    v112 --> v12
+    v117 --> v12
+    v120 --> v12
+    v12 --> v126
+    v126 --> v129
+    v126 --> v128
+    v126 --> v127
+    v126 --> v130
+    v132 --> v133
+    v3 --> v14
+    v51 --> v57
+    v56 --> v57
+    v130 --> v132
