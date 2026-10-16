@@ -18,3 +18,22 @@ dirs: true
 dirs_depth: 1
 
 fn_clean_sample_names: false
+
+module_order:
+  - fastqc:
+      name: "FastQC (raw)"
+      anchor: "fastqc_raw"
+      path_filters:
+        - "*_raw*_fastqc.zip"
+
+  - fastqc:
+      name: "FastQC (trimmed)"
+      anchor: "fastqc_trimmed"
+      path_filters:
+        - "*_trimmed*_fastqc.zip"
+
+  - fastqc:
+      name: "FastQC (filtered)"
+      anchor: "fastqc_filtered"
+      path_filters:
+        - "*_filtered*_fastqc.zip"

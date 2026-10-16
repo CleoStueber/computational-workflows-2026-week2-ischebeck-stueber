@@ -1,0 +1,97 @@
+%%metro title: nf-core/rnaseqischebeckstueber | RNA-seq analysis
+%%metro style: dark
+%%metro legend: bl
+%%metro line_order: definition
+%%metro line_spread: rails
+%%metro compact_offsets: true
+%%metro x_spacing: 82
+%%metro section_x_gap: 65
+%%metro section_y_gap: 60
+
+%%metro grid: reads | 0,0
+%%metro grid: expression | 1,0
+%%metro grid: reference | 0,1
+%%metro grid: strands | 1,1
+
+%%metro line: main | Read processing and expression | #2d9ddd
+%%metro line: qc | Quality checks and MultiQC | #38b8bc
+%%metro line: ref | Reference preparation | #ab6fd1
+%%metro line: strand | Strandedness inference | #eb9a3c
+%%metro line: genes | Gene-level expression | #38be80
+
+%%metro file: fastq | FASTQ | Raw reads
+%%metro files: annotation | FASTA/GTF | Genome and annotation
+%%metro file: trial_fastq | FASTQ | Same raw reads (subsampled)
+%%metro file: qc_html | HTML | MultiQC report
+%%metro off_track: annotation, trial_fastq
+
+graph LR
+    subgraph reads [1  Read preprocessing and QC]
+        fastq[ ]
+        qc_raw[FastQC raw]
+        fastp[fastp]
+        qc_trim[FastQC trimmed]
+        ribo[RiboDetector]
+        qc_filtered[FastQC filtered]
+        qc_prep[Prepare FastQC for MultiQC]
+
+        fastq -->|main| fastp
+        fastp -->|main| ribo
+        fastq -->|qc| qc_raw
+        fastp -->|qc| qc_trim
+        ribo -->|qc| qc_filtered
+        qc_raw -->|qc| qc_prep
+        qc_trim -->|qc| qc_prep
+        qc_filtered -->|qc| qc_prep
+    end
+
+    subgraph reference [2  Reference preparation]
+        annotation[ ]
+        filter_gtf[Filter GTF]
+        gffread[GffRead]
+        index[Salmon index]
+
+        annotation -->|ref| filter_gtf
+        filter_gtf -->|ref| gffread
+        gffread -->|ref| index
+    end
+
+    subgraph strands [3  Library strandedness]
+        trial_fastq[ ]
+        subsample[FQ subsample]
+        salmon_trial[Salmon trial quantification]
+        infer[Infer strandedness]
+
+        trial_fastq -->|strand| subsample
+        subsample -->|strand| salmon_trial
+        salmon_trial -->|strand| infer
+    end
+
+    subgraph expression [4  Quantification and reporting]
+        salmon_full[Salmon quantification]
+        tx2gene[Custom tx2gene]
+        tximport[tximeta / tximport]
+        abundance[Top 20 mean TPM genes]
+        multiqc[MultiQC]
+        qc_html[ ]
+
+        salmon_full -->|genes| tx2gene
+        salmon_full -->|genes| tximport
+        tx2gene -->|genes| tximport
+        tximport -->|genes| abundance
+        abundance -->|genes| multiqc
+        multiqc -->|qc| qc_html
+    end
+
+    %% Four key connections between the stages (rather than a large grey network)
+    ribo -->|main| salmon_full
+    index -->|ref| salmon_trial
+    infer -->|strand| salmon_full
+    qc_prep -->|qc| multiqc
+
+    %% Presentation simplifications (still used by the real workflow):
+    %% The Salmon index, transcript FASTA and filtered GTF also feed full Salmon.
+    %% The filtered GTF also feeds tx2gene.
+    %% Original reads feed FQ subsample (shown by repeating the FASTQ input icon).
+    %% fastp and Salmon statistics, software versions, etc. feed MultiQC.
+    %% The tximport outputs (counts/TPM/lengths) are produced but not drawn.

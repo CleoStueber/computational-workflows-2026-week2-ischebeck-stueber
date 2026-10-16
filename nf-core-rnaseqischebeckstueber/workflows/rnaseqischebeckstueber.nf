@@ -9,7 +9,6 @@ include { FASTP }                       from '../modules/nf-core/fastp/main'
 include { RIBODETECTOR }                from '../modules/nf-core/ribodetector/main'
 include { FASTQC as FASTQC_FILTERED }   from '../modules/nf-core/fastqc/main'
 include { FASTQ_SUBSAMPLE_FQ_SALMON }   from '../subworkflows/nf-core/fastq_subsample_fq_salmon/main'
-include { PREPARE_FASTQC_MULTIQC }      from '../modules/local/prepare_fastqc_multiqc/main'
 include { FILTER_GTF }                  from '../modules/local/filtergtf/main'
 include { GFFREAD }                     from '../modules/nf-core/gffread/main' 
 include { SALMON_INDEX }                from '../modules/nf-core/salmon/index/main' 
@@ -44,24 +43,41 @@ workflow RNASEQISCHEBECKSTUEBER {
 
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
+
+    // ---------------------------- SAMPLESHEET ----------------------------
+    ch_validated_samples = ch_samplesheet.toList().flatMap { samples ->
+
+            def ids = samples.collect { it[0].id.toString() }
+            def duplicates = ids.countBy { it }.findAll { id, count -> count > 1 }.keySet()
+
+            if (duplicates) {
+                error """
+                Duplicate sample IDs detected: ${duplicates.join(', ')}
+                Each sample must have a unique ID.
+                Please correct the samplesheet and rerun.
+                """
+            }
+            return samples
+        }
+
     // ---------------------------- PREPROCESSING ----------------------------
     //
     // MODULE: Run FastQC_RAW
     //
-    FASTQC_RAW(ch_samplesheet)
+    FASTQC_RAW(ch_validated_samples)
 
     //
     // MODULE: Trim reads with fastp
     //
-    ch_fastp_input = ch_samplesheet.map { meta, reads ->
+    ch_fastp_input = ch_validated_samples.map { meta, reads ->
         [meta, reads, []]
     }
 
     FASTP(
         ch_fastp_input,
-        false, // do not discard the successfully trimmed reads
-        false, // do not save the failed fastp filtering reads
-        false // do not merge paired ends R1 + R2
+        false,  // do not discard the successfully trimmed reads
+        false,  // do not save the failed fastp filtering reads
+        false   // do not merge paired ends R1 + R2
     )
 
     ch_multiqc_files = ch_multiqc_files.mix(
@@ -93,22 +109,11 @@ workflow RNASEQISCHEBECKSTUEBER {
     // FastQC: quality control after rRNA removal
     FASTQC_FILTERED(RIBODETECTOR.out.fastq)
 
-    ch_fastqc_multiqc = FASTQC_RAW.out.zip.map { meta, file ->
-        tuple(meta, 'raw', file)
-    }.mix(
-        FASTQC_TRIMMED.out.zip.map { meta, file ->
-            tuple(meta, 'trimmed', file)
-        }
-    ).mix(
-        FASTQC_FILTERED.out.zip.map { meta, file ->
-            tuple(meta, 'filtered', file)
-        }
-    )
-
-    PREPARE_FASTQC_MULTIQC(ch_fastqc_multiqc)
-
+    // Collect FastQC ZIP reports from all three stages
     ch_multiqc_files = ch_multiqc_files.mix(
-        PREPARE_FASTQC_MULTIQC.out.reports
+        FASTQC_RAW.out.zip.map { meta, files -> files },
+        FASTQC_TRIMMED.out.zip.map { meta, files -> files },
+        FASTQC_FILTERED.out.zip.map { meta, files -> files }
     )
 
     //
@@ -157,7 +162,7 @@ workflow RNASEQISCHEBECKSTUEBER {
         .map { meta, index -> index }
 
     FASTQ_SUBSAMPLE_FQ_SALMON(
-        ch_samplesheet,
+        ch_validated_samples,
         genome_fasta,
         ch_transcript_fasta,
         ch_filtered_gtf,
