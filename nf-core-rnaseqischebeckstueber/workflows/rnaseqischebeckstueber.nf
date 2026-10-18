@@ -80,29 +80,41 @@ workflow RNASEQISCHEBECKSTUEBER {
     //
     // MODULE: RiboDetector removes rRNA from trimmed reads
     //
-    ch_ribo_input = FASTP.out.reads
-        .join(FASTP.out.json, failOnMismatch: true, failOnDuplicate: true)
-        .map { meta, reads, json ->
-            def stats = new groovy.json.JsonSlurper()
-                .parseText(json.text).summary.after_filtering
 
-            def lengths = [stats.read1_mean_length, stats.read2_mean_length]
-                .findAll { it != null }
+    // Use trimmed reads by default
+    ch_stranded_reads = FASTP.out.reads
 
-            tuple(meta, reads, Math.round(lengths.sum() / lengths.size()) as int)
-        }
-
-    RIBODETECTOR(ch_ribo_input) // CHANGED INPUT!!!! [meta, trimmed FASTQ files, calculated mean read length]
-
-    // FastQC: quality control after rRNA removal
-    FASTQC_FILTERED(RIBODETECTOR.out.fastq)
-
-    // Collect FastQC ZIP reports from all three stages
+    // Collect FastQC reports
     ch_multiqc_files = ch_multiqc_files.mix(
         FASTQC_RAW.out.zip.map { meta, files -> files },
-        FASTQC_TRIMMED.out.zip.map { meta, files -> files },
-        FASTQC_FILTERED.out.zip.map { meta, files -> files }
+        FASTQC_TRIMMED.out.zip.map { meta, files -> files }
     )
+
+    // Optional rRNA removal
+    if (!params.skip_ribodetector) {
+        ch_ribo_input = FASTP.out.reads
+            .join(FASTP.out.json, failOnMismatch: true, failOnDuplicate: true)
+            .map { meta, reads, json ->
+                def stats = new groovy.json.JsonSlurper()
+                    .parseText(json.text).summary.after_filtering
+
+                def lengths = [stats.read1_mean_length, stats.read2_mean_length]
+                    .findAll { it != null }
+
+                tuple(meta, reads, Math.round(lengths.sum() / lengths.size()) as int)
+            }
+
+        RIBODETECTOR(ch_ribo_input) // CHANGED INPUT!!!! [meta, trimmed FASTQ files, calculated mean read length]
+
+        // FastQC: quality control after rRNA removal
+        FASTQC_FILTERED(RIBODETECTOR.out.fastq)
+
+        ch_stranded_reads = RIBODETECTOR.out.fastq
+
+        ch_multiqc_files = ch_multiqc_files.mix(
+            FASTQC_FILTERED.out.zip.map { meta, files -> files }
+        )
+    }
 
     //
     // MODULE: Filter GTF to contigs present in genome FASTA
@@ -143,11 +155,6 @@ workflow RNASEQISCHEBECKSTUEBER {
 
     SALMON_INDEX(ch_salmon_index_input)
 
-    //
-    // Use rRNA-filtered reads for Salmon quantification
-    //
-    ch_stranded_reads = RIBODETECTOR.out.fastq
-    
     //
     // MODULE: Quantify transcripts with Salmon
     //
