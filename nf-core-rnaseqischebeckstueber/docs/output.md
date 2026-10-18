@@ -17,7 +17,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [fastp](#fastp) - Adapter trimming and read quality filtering
 - [RiboDetector](#ribodetector) - Identification and removal of rRNA reads
 - [Reference preparation](#reference-preparation) - Prepare the reference annotation, transcript sequences and Salmon index
-- [Salmon](#salmon) - Transcript quantification and library strandedness inference
+- [Salmon](#salmon) - Transcript quantification and automatic library-type detection when needed
 - [tximport](#tximport) - Combine quantification results into expression matrices
 - [Gene abundance](#gene-abundance) - Summary of the 20 genes with the highest mean TPM
 - [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
@@ -105,13 +105,14 @@ The reference annotation is filtered and transcript sequences are extracted usin
   - `<sample>/quant.genes.sf`: Gene-level abundance estimates.
   - `<sample>/aux_info/`: Additional quantification statistics.
   - `<sample>/logs/`: Execution logs.
+  - `<sample>/lib_format_counts.json`: Counts of reads matching different library orientations.
+  - `<sample>/aux_info/meta_info.json`: Quantification statistics and detected library type.
 
 </details>
 
 [Salmon](https://combine-lab.github.io/salmon/) estimates transcript and gene abundance from the processed sequencing reads.
 
-If library strandedness is missing or specified as `auto`, the pipeline uses subsampled reads (`fq_subsample/`) and Salmon (`salmon_strandedness/`) to infer strandedness.
-
+If library strandedness is missing, empty, or set to `auto`, Salmon automatically detects the library type during quantification using `--libType A`. Otherwise, the specified library type is used.
 
 ### tximport
 

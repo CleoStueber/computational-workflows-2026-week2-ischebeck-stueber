@@ -38,11 +38,10 @@ The pipeline produces QC reports, expression matrices, and a MultiQC report cont
 4. Remove rRNA reads using [RiboDetector](https://github.com/hzi-bifo/RiboDetector).
 5. Run FastQC on rRNA-filtered reads.
 6. Prepare the reference by filtering the GTF annotation, extracting transcript sequences with [GFFRead](https://github.com/gpertea/gffread), and building a Salmon index.
-7. Estimate library strandedness using [Salmon](https://salmon.readthedocs.io/) on a subset of reads when strandedness is not provided.
-8. Quantify transcript abundance using Salmon.
-9. Generate transcript- and gene-level expression matrices using [tximport](https://bioconductor.org/packages/tximport/) / [tximeta](https://bioconductor.org/packages/tximeta/).
-10. Calculate the 20 genes with the highest mean TPM across samples (`GENE_ABUNDANCE`).
-11. Combine QC results, pipeline parameters, software versions, and the gene abundance summary in [MultiQC](https://multiqc.info/).
+7. Quantify transcript abundance using [Salmon](https://salmon.readthedocs.io/). Library strandedness is automatically detected by Salmon if not specified.
+8. Generate transcript- and gene-level expression matrices using [tximport](https://bioconductor.org/packages/tximport/) / [tximeta](https://bioconductor.org/packages/tximeta/).
+9. Calculate the 20 genes with the highest mean TPM across samples (`GENE_ABUNDANCE`).
+10. Combine QC results, pipeline parameters, software versions, and the gene abundance summary in [MultiQC](https://multiqc.info/).
 
 ## Usage
 
@@ -75,7 +74,7 @@ sample2,data/sample2.fastq.gz
 - `sample`: sample name without spaces.
 - `fastq_1`: required path to the first FASTQ file.
 - `fastq_2`: optional path to the second FASTQ file for paired-end data.
-- `strandedness`: optional column with `forward`, `reverse`, `unstranded`, or `auto`. If omitted or set to `auto`, strandedness is inferred.
+- `strandedness`: optional column with `forward`, `reverse`, `unstranded`, or `auto`. If omitted, left empty, or set to `auto`, Salmon automatically detects the library type during quantification.
 
 Files must end in `.fastq.gz` or `.fq.gz`. Multiple rows can have the same sample name when reads from more than one run belong to the same sample.
 
@@ -113,9 +112,9 @@ For more information, see [usage documentation](docs/usage.md).
 
 Results are saved under the directory specified with `--outdir`. The main outputs are:
 
-- **Quality control and preprocessing:** FastQC reports for raw, trimmed, and rRNA-filtered reads; fastp statistics; RiboDetector-filtered reads; and Salmon strandedness estimates.
+- **Quality control and preprocessing:** FastQC reports for raw, trimmed, and rRNA-filtered reads; fastp statistics; and RiboDetector-filtered reads.
 - **Reference preparation:** filtered GTF annotation, transcript FASTA, Salmon index, and transcript-to-gene mapping.
-- **Transcript quantification:** Salmon quantification files and statistics for each sample.
+- **Transcript quantification:** Salmon quantification files, mapping statistics, and library-type information for each sample.
 - **Transcript expression matrices:** `*.transcript_counts.tsv`, `*.transcript_tpm.tsv`, and `*.transcript_lengths.tsv`.
 - **Gene expression matrices:** `*.gene_counts.tsv`, `*.gene_tpm.tsv`, `*.gene_lengths.tsv`, `*.gene_counts_length_scaled.tsv`, and `*.gene_counts_scaled.tsv`.
 - **Gene abundance summary:** `gene_abundance_mqc.tsv`, containing the 20 genes with the highest mean TPM across samples.

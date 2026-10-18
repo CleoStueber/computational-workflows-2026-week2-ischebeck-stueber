@@ -9,7 +9,6 @@ include { FASTQC as FASTQC_TRIMMED }    from '../modules/nf-core/fastqc/main'
 include { FASTP }                       from '../modules/nf-core/fastp/main'
 include { RIBODETECTOR }                from '../modules/nf-core/ribodetector/main'
 include { FASTQC as FASTQC_FILTERED }   from '../modules/nf-core/fastqc/main'
-include { FASTQ_SUBSAMPLE_FQ_SALMON }   from '../subworkflows/nf-core/fastq_subsample_fq_salmon/main'
 include { FILTER_GTF }                  from '../modules/local/filtergtf/main'
 include { GFFREAD }                     from '../modules/nf-core/gffread/main' 
 include { SALMON_INDEX }                from '../modules/nf-core/salmon/index/main' 
@@ -21,7 +20,7 @@ include { MULTIQC }                     from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap }            from 'plugin/nf-schema'
 include { paramsSummaryMultiqc }        from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML }      from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText; inferStrandedness } from '../subworkflows/local/utils_nfcore_rnaseqischebeckstueber_pipeline'
+include { methodsDescriptionText }      from '../subworkflows/local/utils_nfcore_rnaseqischebeckstueber_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,44 +144,10 @@ workflow RNASEQISCHEBECKSTUEBER {
     SALMON_INDEX(ch_salmon_index_input)
 
     //
-    // SUBWORKFLOW: Infer strandedness if not provided using raw FASTQ reads
+    // Use rRNA-filtered reads for Salmon quantification
     //
-    // Separate samples with known and unknown strandedness
-    ch_strand_groups = ch_merged_samples.branch { meta, reads ->
-        infer: !(meta.strandedness in ['forward', 'reverse', 'unstranded'])
-        provided: true
-    }
-
-    // Salmon index for strandedness inference
-    ch_index_for_inference = SALMON_INDEX.out.index
-        .map { meta, index -> index }
-
-    // Infer strandedness only for samples without a known value
-    FASTQ_SUBSAMPLE_FQ_SALMON(
-        ch_strand_groups.infer,
-        genome_fasta,
-        ch_transcript_fasta,
-        ch_filtered_gtf,
-        ch_index_for_inference,
-        false
-    )
-
-    // Separate processed reads using the same criterion
-    ch_ribo_groups = RIBODETECTOR.out.fastq.branch { meta, reads ->
-        infer: !(meta.strandedness in ['forward', 'reverse', 'unstranded'])
-        provided: true
-    }
+    ch_stranded_reads = RIBODETECTOR.out.fastq
     
-    // Assign inferred strandedness
-    ch_inferred_reads = FASTQ_SUBSAMPLE_FQ_SALMON.out.lib_format_counts
-        .join(ch_ribo_groups.infer, failOnMismatch: true, failOnDuplicate: true)
-        .map { meta, json, reads ->
-            tuple(meta + [strandedness: inferStrandedness(json)], reads)
-        }
-
-    // Combine samples with provided and inferred strandedness
-    ch_stranded_reads = ch_ribo_groups.provided.mix(ch_inferred_reads)
-
     //
     // MODULE: Quantify transcripts with Salmon
     //

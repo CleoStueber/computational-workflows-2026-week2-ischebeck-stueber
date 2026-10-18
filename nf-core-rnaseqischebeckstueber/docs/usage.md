@@ -4,7 +4,7 @@
 
 The pipeline requires a comma-separated samplesheet specified using `--input`. The columns `sample` and `fastq_1` are required, while `fastq_2` and `strandedness` are optional. Single-end and paired-end data are supported.
 
-The optional `strandedness` column accepts `forward`, `reverse`, `unstranded`, or `auto`. If omitted or set to `auto`, library strandedness is inferred automatically.
+The optional `strandedness` column accepts `forward`, `reverse`, `unstranded`, or `auto`. If omitted, left empty, or set to `auto`, Salmon automatically detects the library type during quantification.
 
 
 ## Samplesheet input
@@ -34,7 +34,7 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 
 The pipeline automatically determines whether reads are single-end or paired-end based on the `fastq_2` column. If this column is empty or omitted, the sample is treated as single-end.
 
-Library strandedness can optionally be specified. If `strandedness` is missing or set to `auto`, the pipeline infers it automatically using subsampled reads and Salmon.
+Library strandedness can optionally be specified. If it is missing, empty, or set to `auto`, Salmon automatically detects the library type during quantification.
 
 An example samplesheet containing both single-end and paired-end data:
 
@@ -54,11 +54,11 @@ TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,,auto
 | `sample` | Yes | Sample identifier without spaces. Identical for multiple runs of the same sample. |
 | `fastq_1` | Yes | Path to the first FASTQ file (`.fastq.gz` or `.fq.gz`). |
 | `fastq_2` | No | Path to the second FASTQ file for paired-end sequencing. Leave empty for single-end reads. |
-| `strandedness` | No | Library strandedness: `forward`, `reverse`, `unstranded`, or `auto`. Missing or `auto` values trigger automatic inference. |
+| `strandedness` | No | Library strandedness: `forward`, `reverse`, `unstranded`, or `auto`. Missing, empty, or `auto` values trigger automatic detection by Salmon. |
 
 FASTQ files must be gzip-compressed and accessible to the pipeline. Repeated runs of the same sample should have consistent strandedness annotations.
 
-An [example samplesheet](../assets/test_samplesheet_full.csv) has been provided with the pipeline.
+An [example samplesheet](../test_samplesheet_full.csv) has been provided with the pipeline.
 
 ## Running the pipeline
 
