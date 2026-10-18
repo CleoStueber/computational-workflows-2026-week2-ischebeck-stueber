@@ -1,6 +1,11 @@
 .DS_Store
-.nextflow*.log
+.nextflow/
+.nextflow.log*
+work/
+.nf-test/
+
 fetchngs_out/
 rnaseq_out_allsamples/
+results_test/
+
 /computational_workflows_project_2026.pdf
-.nextflow.log*

@@ -4,6 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { FASTQC as FASTQC_RAW }        from '../modules/nf-core/fastqc/main'
+include { CAT_FASTQ }                   from '../modules/nf-core/cat/fastq/main'
 include { FASTQC as FASTQC_TRIMMED }    from '../modules/nf-core/fastqc/main'
 include { FASTP }                       from '../modules/nf-core/fastp/main'
 include { RIBODETECTOR }                from '../modules/nf-core/ribodetector/main'
@@ -44,32 +45,20 @@ workflow RNASEQISCHEBECKSTUEBER {
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
 
-    // ---------------------------- SAMPLESHEET ----------------------------
-    ch_validated_samples = ch_samplesheet.toList().flatMap { samples ->
+    CAT_FASTQ(ch_samplesheet)
 
-            def ids = samples.collect { it[0].id.toString() }
-            def duplicates = ids.countBy { it }.findAll { id, count -> count > 1 }.keySet()
-
-            if (duplicates) {
-                error """
-                Duplicate sample IDs detected: ${duplicates.join(', ')}
-                Each sample must have a unique ID.
-                Please correct the samplesheet and rerun.
-                """
-            }
-            return samples
-        }
+    ch_merged_samples = CAT_FASTQ.out.reads
 
     // ---------------------------- PREPROCESSING ----------------------------
     //
     // MODULE: Run FastQC_RAW
     //
-    FASTQC_RAW(ch_validated_samples)
+    FASTQC_RAW(ch_merged_samples)
 
     //
     // MODULE: Trim reads with fastp
     //
-    ch_fastp_input = ch_validated_samples.map { meta, reads ->
+    ch_fastp_input = ch_merged_samples.map { meta, reads ->
         [meta, reads, []]
     }
 
@@ -156,13 +145,21 @@ workflow RNASEQISCHEBECKSTUEBER {
     SALMON_INDEX(ch_salmon_index_input)
 
     //
-    // SUBWORKFLOW: Infer strandedness using raw FASTQ reads
+    // SUBWORKFLOW: Infer strandedness if not provided using raw FASTQ reads
     //
+    // Separate samples with known and unknown strandedness
+    ch_strand_groups = ch_merged_samples.branch { meta, reads ->
+        infer: !(meta.strandedness in ['forward', 'reverse', 'unstranded'])
+        provided: true
+    }
+
+    // Salmon index for strandedness inference
     ch_index_for_inference = SALMON_INDEX.out.index
         .map { meta, index -> index }
 
+    // Infer strandedness only for samples without a known value
     FASTQ_SUBSAMPLE_FQ_SALMON(
-        ch_validated_samples,
+        ch_strand_groups.infer,
         genome_fasta,
         ch_transcript_fasta,
         ch_filtered_gtf,
@@ -170,12 +167,22 @@ workflow RNASEQISCHEBECKSTUEBER {
         false
     )
 
-    ch_stranded_reads = FASTQ_SUBSAMPLE_FQ_SALMON.out.lib_format_counts
-        .join(RIBODETECTOR.out.fastq, failOnMismatch: true, failOnDuplicate: true)
+    // Separate processed reads using the same criterion
+    ch_ribo_groups = RIBODETECTOR.out.fastq.branch { meta, reads ->
+        infer: !(meta.strandedness in ['forward', 'reverse', 'unstranded'])
+        provided: true
+    }
+    
+    // Assign inferred strandedness
+    ch_inferred_reads = FASTQ_SUBSAMPLE_FQ_SALMON.out.lib_format_counts
+        .join(ch_ribo_groups.infer, failOnMismatch: true, failOnDuplicate: true)
         .map { meta, json, reads ->
             tuple(meta + [strandedness: inferStrandedness(json)], reads)
         }
-    
+
+    // Combine samples with provided and inferred strandedness
+    ch_stranded_reads = ch_ribo_groups.provided.mix(ch_inferred_reads)
+
     //
     // MODULE: Quantify transcripts with Salmon
     //

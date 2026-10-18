@@ -15,14 +15,24 @@ process FILTER_GTF {
 
     script:
     """
-    grep '^>' ${fasta} \
-        | sed 's/^>//' \
-        | cut -d ' ' -f1 \
-        > fasta_contigs.txt
+    if [[ "${fasta}" == *.gz ]]; then
+        gzip -cd "${fasta}" > input.fasta
+    else
+        cp "${fasta}" input.fasta
+    fi
 
-    awk 'NR==FNR {keep[\$1]; next} /^#/ || (\$1 in keep)' \
-        fasta_contigs.txt \
-        ${gtf} \
-        > filtered.gtf
+    if [[ "${gtf}" == *.gz ]]; then
+        gzip -cd "${gtf}" > input.gtf
+    else
+        cp "${gtf}" input.gtf
+    fi
+
+    awk '/^>/ {print substr(\$1, 2)}' input.fasta > fasta_contigs.txt
+
+    awk 'NR==FNR {keep[\$1]; next} /^#/ || ((\$1 in keep) && /transcript_id "[^"]+"/)' \
+        fasta_contigs.txt input.gtf > filtered.gtf
+
+    test -s filtered.gtf
     """
+
 }
