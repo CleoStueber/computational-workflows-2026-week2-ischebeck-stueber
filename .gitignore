@@ -3,6 +3,7 @@
 .nextflow.log*
 work/
 .nf-test/
+.nf-test.log
 
 fetchngs_out/
 rnaseq_out_allsamples/

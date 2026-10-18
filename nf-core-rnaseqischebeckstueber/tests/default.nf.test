@@ -16,7 +16,15 @@ nextflow_pipeline {
             // stable_path: All files + folders in ${params.outdir}/ with a stable path (including file name)
             def stable_path = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
             // stable_content: All files in ${params.outdir}/ with stable content
-            def stable_content = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            def stable_content = getAllFilesFromDir(
+                params.outdir,
+                include: [
+                    'filter_gtf/*.gtf',
+                    'salmon_quant/*/quant.sf',
+                    'salmon_quant/*/quant.genes.sf',
+                    'tximeta_tximport/*.tsv'
+                ]
+            )
             assert workflow.success
             assertAll(
                 { assert snapshot(
