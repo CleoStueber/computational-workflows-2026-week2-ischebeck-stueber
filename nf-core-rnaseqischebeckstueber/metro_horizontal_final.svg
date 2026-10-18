@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1195" height="474" viewBox="0 0 1195 474" style="color-scheme: light dark">
+<defs>
+</defs>
+<metadata id="diagram-manifest" data-schema-version="1.0"><![CDATA[{"groups":[{"color":"#2d9ddd","id":"reads","label":"Read preprocessing"},{"color":"#38b8bc","id":"qc","label":"Quality control and reporting"},{"color":"#38be80","id":"genes","label":"Gene expression"},{"color":"#ab6fd1","id":"ref","label":"Reference preparation"}],"height":474,"match":{"flags":"i","target":"fqProcessName","type":"regex"},"nodes":[{"groups":["reads"],"h":10.0,"id":"raw","label":"raw","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":80.0,"y":150.0},{"groups":["qc","reads"],"h":14.0,"id":"cat_fastq","label":"CAT_FASTQ","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":200.0,"y":152.0},{"groups":["qc","reads"],"h":14.0,"id":"fastp","label":"fastp","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":320.0,"y":152.0},{"groups":["qc","reads"],"h":14.0,"id":"ribo","label":"RiboDetector","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":440.0,"y":152.0},{"groups":["qc"],"h":10.0,"id":"qc_raw","label":"FastQC raw","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":320.0,"y":200.0},{"groups":["qc"],"h":10.0,"id":"qc_trim","label":"FastQC trimmed","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":440.0,"y":200.0},{"groups":["qc"],"h":10.0,"id":"qc_filtered","label":"FastQC filtered","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":657.5,"y":200.0},{"groups":["genes","reads","ref"],"h":14.0,"id":"salmon_quant","label":"Salmon quant","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":657.5,"y":152.0},{"groups":["genes"],"h":10.0,"id":"tx2gene","label":"tx2gene","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":732.5,"y":150.0},{"groups":["genes"],"h":10.0,"id":"tximport","label":"tximport","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":807.5,"y":150.0},{"groups":["genes"],"h":10.0,"id":"abundance","label":"Top 20 genes","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":882.5,"y":150.0},{"groups":["genes","qc"],"h":14.0,"id":"multiqc","label":"MultiQC","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":1077.5,"y":202.0},{"groups":["ref"],"h":10.0,"id":"genome","label":"genome","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":80.0,"y":200.0},{"groups":["ref"],"h":10.0,"id":"annotation","label":"annotation","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":80.0,"y":250.0},{"groups":["ref"],"h":10.0,"id":"filter_gtf","label":"Filter GTF","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":200.0,"y":250.0},{"groups":["ref"],"h":10.0,"id":"gffread","label":"GffRead","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":320.0,"y":250.0},{"groups":["ref"],"h":10.0,"id":"salmon_index","label":"Salmon index","patterns":[],"r":5.0,"region":"pipeline","rx":5.0,"w":10.0,"x":440.0,"y":250.0}],"regions":[{"id":"pipeline","label":"RNA-seq workflow"}],"title":"nf-core/rnaseqischebeckstueber | RNA-seq workflow","version":"1.0","width":1195}]]></metadata>
+<style>.nf-metro-bg { fill: var(--nfm-map-bg, light-dark(#f5f5f5, #2b2b2b)); }
+.nf-metro-title { fill: var(--nfm-map-title-color, light-dark(#111111, #ffffff)); }
+.nf-metro-station-label { fill: var(--nfm-map-label-color, light-dark(#333333, #e0e0e0)); }
+.nf-metro-section-box { fill: var(--nfm-map-section-fill, light-dark(#ededed, #373737)); stroke: var(--nfm-map-section-stroke, light-dark(#e6e6e6, #595959)); }
+.nf-metro-section-label { fill: var(--nfm-map-section-label-color, light-dark(#666666, #c8c8c8)); }
+.nf-metro-group-label { fill: var(--nfm-map-section-label-color, light-dark(#666666, #c8c8c8)); }
+.nf-metro-group-underline { stroke: var(--nfm-map-section-label-color, light-dark(#666666, #c8c8c8)); }
+.nf-metro-legend-bg { fill: var(--nfm-map-legend-bg, light-dark(rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0.3))); }
+.nf-metro-legend-text { fill: var(--nfm-map-legend-text-color, light-dark(#333333, #e0e0e0)); }
+.nf-metro-marker-stroke { stroke: var(--nfm-map-marker-stroke, light-dark(#333333, #f0f0f0)); }
+.nf-metro-label-halo { fill: var(--nfm-map-bg, light-dark(#f5f5f5, #2b2b2b)); stroke: var(--nfm-map-bg, light-dark(#f5f5f5, #2b2b2b)); }</style>
+<rect x="0" y="0" width="1195" height="474" fill="#2b2b2b" class="nf-metro-bg" />
+<text x="60.0" y="30.0" font-size="24.0" fill="#ffffff" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" class="nf-metro-title">nf-core/rnaseqischebeckstueber | RNA-seq workflow</text>
+<rect x="22.0" y="100.0" width="1113.5" height="200.0" rx="8" ry="8" fill="#373737" stroke="#595959" stroke-width="1.0" class="nf-metro-section-box" data-section-id="pipeline" data-section-lines="genes,qc,reads,ref" />
+<circle cx="33.0" cy="85.0" r="11" fill="#333333" class="nf-metro-section-num-circle" data-section-id="pipeline" />
+<text x="33.0" y="85.0" font-size="12" fill="#ffffff" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dy="0.3em" data-section-id="pipeline">1</text>
+<text x="49.0" y="85.0" font-size="16.0" fill="#c8c8c8" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" dy="0.3em" class="nf-metro-section-label" data-section-id="pipeline">RNA-seq workflow</text>
+<path d="M80.0,200.0 L115.0,200.0 Q125.0,200.0,130.14495755427527,208.57492925712543 L149.85504244572473,241.42507074287457 Q155.0,250.0,165.0,250.0 L200.0,250.0" stroke="#ab6fd1" stroke-width="3.0" fill="none" stroke-linecap="round" stroke-linejoin="round" class="metro-line-ref" data-line-id="ref" />
+<path d="M80.0,250.0 L200.0,250.0" stroke="#ab6fd1" stroke-width="3.0" stroke-linecap="round" class="metro-line-ref" data-line-id="ref" />
+<path d="M200.0,250.0 L320.0,250.0" stroke="#ab6fd1" stroke-width="3.0" stroke-linecap="round" class="metro-line-ref" data-line-id="ref" />
+<path d="M320.0,250.0 L440.0,250.0" stroke="#ab6fd1" stroke-width="3.0" stroke-linecap="round" class="metro-line-ref" data-line-id="ref" />
+<path d="M440.0,250.0 L563.5,250.0 Q573.5,250.0,576.4827499313594,240.4552002196497 L600.5172500686406,163.5447997803503 Q603.5,154.0,613.5,154.0 L657.5,154.0" stroke="#ab6fd1" stroke-width="3.0" fill="none" stroke-linecap="round" stroke-linejoin="round" class="metro-line-ref" data-line-id="ref" />
+<path d="M657.5,150.0 L732.5,150.0" stroke="#38be80" stroke-width="3.0" stroke-linecap="round" class="metro-line-genes" data-line-id="genes" />
+<path d="M732.5,150.0 L807.5,150.0" stroke="#38be80" stroke-width="3.0" stroke-linecap="round" class="metro-line-genes" data-line-id="genes" />
+<path d="M807.5,150.0 L882.5,150.0" stroke="#38be80" stroke-width="3.0" stroke-linecap="round" class="metro-line-genes" data-line-id="genes" />
+<path d="M882.5,150.0 L952.5,150.0 Q962.5,150.0,967.3564293117863,158.74157276121537 L987.6435706882137,195.25842723878463 Q992.5,204.0,1002.5,204.0 L1002.5,204.0" stroke="#38be80" stroke-width="3.0" fill="none" stroke-linecap="round" stroke-linejoin="round" class="metro-line-genes" data-line-id="genes" />
+<path d="M1002.5,204.0 L1077.5,204.0" stroke="#38be80" stroke-width="3.0" stroke-linecap="round" class="metro-line-genes" data-line-id="genes" />
+<path d="M200.0,154.0 L230.5,154.0 Q240.5,154.0,245.9626778054692,162.37610596838613 L265.03732219453076,191.62389403161387 Q270.5,200.0,280.5,200.0 L320.0,200.0" stroke="#38b8bc" stroke-width="3.0" fill="none" stroke-linecap="round" stroke-linejoin="round" class="metro-line-qc" data-line-id="qc" />
+<path d="M320.0,154.0 L332.5,154.0 Q342.5,154.0,347.96267780546924,162.37610596838613 L367.03732219453076,191.62389403161387 Q372.5,200.0,382.5,200.0 L440.0,200.0" stroke="#38b8bc" stroke-width="3.0" fill="none" stroke-linecap="round" stroke-linejoin="round" class="metro-line-qc" data-line-id="qc" />
+<path d="M440.0,154.0 L484.0,154.0 Q494.0,154.0,499.46267780546924,162.37610596838613 L518.5373221945308,191.62389403161387 Q524.0,200.0,534.0,200.0 L657.5,200.0" stroke="#38b8bc" stroke-width="3.0" fill="none" stroke-linecap="round" stroke-linejoin="round" class="metro-line-qc" data-line-id="qc" />
+<path d="M320.0,200.0 L440.0,200.0" stroke="#38b8bc" stroke-width="3.0" stroke-linecap="round" class="metro-line-qc" data-line-id="qc" />
+<path d="M440.0,200.0 L657.5,200.0" stroke="#38b8bc" stroke-width="3.0" stroke-linecap="round" class="metro-line-qc" data-line-id="qc" />
+<path d="M657.5,200.0 L1002.5,200.0" stroke="#38b8bc" stroke-width="3.0" stroke-linecap="round" class="metro-line-qc" data-line-id="qc" />
+<path d="M1002.5,200.0 L1077.5,200.0" stroke="#38b8bc" stroke-width="3.0" stroke-linecap="round" class="metro-line-qc" data-line-id="qc" />
+<path d="M80.0,150.0 L200.0,150.0" stroke="#2d9ddd" stroke-width="3.0" stroke-linecap="round" class="metro-line-reads" data-line-id="reads" />
+<path d="M200.0,150.0 L320.0,150.0" stroke="#2d9ddd" stroke-width="3.0" stroke-linecap="round" class="metro-line-reads" data-line-id="reads" />
+<path d="M320.0,150.0 L440.0,150.0" stroke="#2d9ddd" stroke-width="3.0" stroke-linecap="round" class="metro-line-reads" data-line-id="reads" />
+<path d="M440.0,150.0 L657.5,150.0" stroke="#2d9ddd" stroke-width="3.0" stroke-linecap="round" class="metro-line-reads" data-line-id="reads" />
+<g class="nf-metro-station-group" data-node-id="raw" data-node-cx="80.0" data-node-cy="150.0" data-node-r="5.0" data-node-groups="reads" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="75.0" y="145.0" width="10.0" height="10.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="raw" data-station-lines="reads" data-station-label="raw" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+<g data-station-id="raw">
+<path d="M43.0,134.0 L61.0,134.0 L69.0,142.0 L69.0,164.0 Q69.0,166.0,67.0,166.0 L43.0,166.0 Q41.0,166.0,41.0,164.0 L41.0,136.0 Q41.0,134.0,43.0,134.0 Z" fill="#ffffff" stroke="#333333" stroke-width="1.5" stroke-linejoin="round" />
+<path d="M61.0,134.0 L61.0,142.0 L69.0,142.0 Z" fill="#333333" opacity="0.15" stroke="none" />
+<path d="M61.0,134.0 L61.0,142.0 L69.0,142.0" fill="none" stroke="#333333" stroke-width="0.8999999999999999" />
+<text x="55.0" y="151.2" font-size="7.5" fill="#000000" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dy="0.3em">FASTQ</text>
+<text x="55.0" y="170.0" font-size="7.8" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" class="nf-metro-station-label">Raw reads</text>
+</g>
+</g>
+<g class="nf-metro-station-group" data-node-id="cat_fastq" data-node-cx="200.0" data-node-cy="152.0" data-node-r="5.0" data-node-groups="qc,reads" data-node-region="pipeline" data-node-w="10.0" data-node-h="14.0" data-node-rx="5.0">
+<rect x="195.0" y="145.0" width="10.0" height="14.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="cat_fastq" data-station-lines="qc,reads" data-station-label="CAT_FASTQ" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="fastp" data-node-cx="320.0" data-node-cy="152.0" data-node-r="5.0" data-node-groups="qc,reads" data-node-region="pipeline" data-node-w="10.0" data-node-h="14.0" data-node-rx="5.0">
+<rect x="315.0" y="145.0" width="10.0" height="14.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="fastp" data-station-lines="qc,reads" data-station-label="fastp" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="ribo" data-node-cx="440.0" data-node-cy="152.0" data-node-r="5.0" data-node-groups="qc,reads" data-node-region="pipeline" data-node-w="10.0" data-node-h="14.0" data-node-rx="5.0">
+<rect x="435.0" y="145.0" width="10.0" height="14.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="ribo" data-station-lines="qc,reads" data-station-label="RiboDetector" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="qc_raw" data-node-cx="320.0" data-node-cy="200.0" data-node-r="5.0" data-node-groups="qc" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="315.0" y="195.0" width="10.0" height="10.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="qc_raw" data-station-lines="qc" data-station-label="FastQC raw" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="qc_trim" data-node-cx="440.0" data-node-cy="200.0" data-node-r="5.0" data-node-groups="qc" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="435.0" y="195.0" width="10.0" height="10.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="qc_trim" data-station-lines="qc" data-station-label="FastQC trimmed" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="qc_filtered" data-node-cx="657.5" data-node-cy="200.0" data-node-r="5.0" data-node-groups="qc" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="652.5" y="195.0" width="10.0" height="10.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="qc_filtered" data-station-lines="qc" data-station-label="FastQC filtered" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="salmon_quant" data-node-cx="657.5" data-node-cy="152.0" data-node-r="5.0" data-node-groups="genes,reads,ref" data-node-region="pipeline" data-node-w="10.0" data-node-h="14.0" data-node-rx="5.0">
+<rect x="652.5" y="145.0" width="10.0" height="14.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="salmon_quant" data-station-lines="genes,reads,ref" data-station-label="Salmon quant" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="tx2gene" data-node-cx="732.5" data-node-cy="150.0" data-node-r="5.0" data-node-groups="genes" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="727.5" y="145.0" width="10.0" height="10.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="tx2gene" data-station-lines="genes" data-station-label="tx2gene" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="tximport" data-node-cx="807.5" data-node-cy="150.0" data-node-r="5.0" data-node-groups="genes" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="802.5" y="145.0" width="10.0" height="10.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="tximport" data-station-lines="genes" data-station-label="tximport" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="abundance" data-node-cx="882.5" data-node-cy="150.0" data-node-r="5.0" data-node-groups="genes" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="877.5" y="145.0" width="10.0" height="10.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="abundance" data-station-lines="genes" data-station-label="Top 20 genes" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="multiqc" data-node-cx="1077.5" data-node-cy="202.0" data-node-r="5.0" data-node-groups="genes,qc" data-node-region="pipeline" data-node-w="10.0" data-node-h="14.0" data-node-rx="5.0">
+<rect x="1072.5" y="195.0" width="10.0" height="14.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="multiqc" data-station-lines="genes,qc" data-station-label="MultiQC" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+<g data-station-id="multiqc">
+<path d="M1090.5,186.0 L1108.5,186.0 L1116.5,194.0 L1116.5,216.0 Q1116.5,218.0,1114.5,218.0 L1090.5,218.0 Q1088.5,218.0,1088.5,216.0 L1088.5,188.0 Q1088.5,186.0,1090.5,186.0 Z" fill="#ffffff" stroke="#333333" stroke-width="1.5" stroke-linejoin="round" />
+<path d="M1108.5,186.0 L1108.5,194.0 L1116.5,194.0 Z" fill="#333333" opacity="0.15" stroke="none" />
+<path d="M1108.5,186.0 L1108.5,194.0 L1116.5,194.0" fill="none" stroke="#333333" stroke-width="0.8999999999999999" />
+<text x="1102.5" y="203.2" font-size="7.5" fill="#000000" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dy="0.3em">HTML</text>
+<text x="1102.5" y="222.0" font-size="7.8" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" class="nf-metro-station-label">MultiQC report</text>
+</g>
+</g>
+<g class="nf-metro-station-group" data-node-id="genome" data-node-cx="80.0" data-node-cy="200.0" data-node-r="5.0" data-node-groups="ref" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="75.0" y="195.0" width="10.0" height="10.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="genome" data-station-lines="ref" data-station-label="genome" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+<g data-station-id="genome">
+<path d="M43.0,184.0 L61.0,184.0 L69.0,192.0 L69.0,214.0 Q69.0,216.0,67.0,216.0 L43.0,216.0 Q41.0,216.0,41.0,214.0 L41.0,186.0 Q41.0,184.0,43.0,184.0 Z" fill="#ffffff" stroke="#333333" stroke-width="1.5" stroke-linejoin="round" />
+<path d="M61.0,184.0 L61.0,192.0 L69.0,192.0 Z" fill="#333333" opacity="0.15" stroke="none" />
+<path d="M61.0,184.0 L61.0,192.0 L69.0,192.0" fill="none" stroke="#333333" stroke-width="0.8999999999999999" />
+<text x="55.0" y="201.2" font-size="7.5" fill="#000000" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dy="0.3em">FASTA</text>
+<text x="58.32" y="220.0" font-size="7.8" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" class="nf-metro-station-label">Reference genome</text>
+</g>
+</g>
+<g class="nf-metro-station-group" data-node-id="annotation" data-node-cx="80.0" data-node-cy="250.0" data-node-r="5.0" data-node-groups="ref" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="75.0" y="245.0" width="10.0" height="10.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="annotation" data-station-lines="ref" data-station-label="annotation" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+<g data-station-id="annotation">
+<path d="M43.0,234.0 L61.0,234.0 L69.0,242.0 L69.0,264.0 Q69.0,266.0,67.0,266.0 L43.0,266.0 Q41.0,266.0,41.0,264.0 L41.0,236.0 Q41.0,234.0,43.0,234.0 Z" fill="#ffffff" stroke="#333333" stroke-width="1.5" stroke-linejoin="round" />
+<path d="M61.0,234.0 L61.0,242.0 L69.0,242.0 Z" fill="#333333" opacity="0.15" stroke="none" />
+<path d="M61.0,234.0 L61.0,242.0 L69.0,242.0" fill="none" stroke="#333333" stroke-width="0.8999999999999999" />
+<text x="55.0" y="247.075" font-size="7.5" fill="#000000" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dy="0.3em">GTF /</text>
+<text x="55.0" y="255.325" font-size="5.476190476190476" fill="#000000" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dy="0.3em">GTF.zip</text>
+<text x="58.32" y="270.0" font-size="7.8" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" class="nf-metro-station-label">Annotation files</text>
+</g>
+</g>
+<g class="nf-metro-station-group" data-node-id="filter_gtf" data-node-cx="200.0" data-node-cy="250.0" data-node-r="5.0" data-node-groups="ref" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="195.0" y="245.0" width="10.0" height="10.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="filter_gtf" data-station-lines="ref" data-station-label="Filter GTF" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="gffread" data-node-cx="320.0" data-node-cy="250.0" data-node-r="5.0" data-node-groups="ref" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="315.0" y="245.0" width="10.0" height="10.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="gffread" data-station-lines="ref" data-station-label="GffRead" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<g class="nf-metro-station-group" data-node-id="salmon_index" data-node-cx="440.0" data-node-cy="250.0" data-node-r="5.0" data-node-groups="ref" data-node-region="pipeline" data-node-w="10.0" data-node-h="10.0" data-node-rx="5.0">
+<rect x="435.0" y="245.0" width="10.0" height="10.0" rx="5.0" ry="5.0" fill="#ffffff" stroke="#333333" stroke-width="1.5" class="nf-metro-station" data-station-id="salmon_index" data-station-lines="ref" data-station-label="Salmon index" data-section-id="pipeline" data-section-name="RNA-seq workflow" />
+</g>
+<text x="200.0" y="136.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="auto">CAT_FASTQ</text>
+<text x="200.0" y="136.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="auto" data-station-id="cat_fastq" class="nf-metro-station-label">CAT_FASTQ</text>
+<text x="200.0" y="236.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="auto">Filter GTF</text>
+<text x="200.0" y="236.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="auto" data-station-id="filter_gtf" class="nf-metro-station-label">Filter GTF</text>
+<text x="320.0" y="165.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="hanging">fastp</text>
+<text x="320.0" y="165.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" data-station-id="fastp" class="nf-metro-station-label">fastp</text>
+<text x="320.0" y="211.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="hanging">FastQC raw</text>
+<text x="320.0" y="211.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" data-station-id="qc_raw" class="nf-metro-station-label">FastQC raw</text>
+<text x="320.0" y="261.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="hanging">GffRead</text>
+<text x="320.0" y="261.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" data-station-id="gffread" class="nf-metro-station-label">GffRead</text>
+<text x="440.0" y="136.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="auto">RiboDetector</text>
+<text x="440.0" y="136.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="auto" data-station-id="ribo" class="nf-metro-station-label">RiboDetector</text>
+<text x="440.0" y="186.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="auto">FastQC trimmed</text>
+<text x="440.0" y="186.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="auto" data-station-id="qc_trim" class="nf-metro-station-label">FastQC trimmed</text>
+<text x="440.0" y="236.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="auto">Salmon index</text>
+<text x="440.0" y="236.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="auto" data-station-id="salmon_index" class="nf-metro-station-label">Salmon index</text>
+<text x="657.5" y="165.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="hanging">Salmon quant</text>
+<text x="657.5" y="165.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" data-station-id="salmon_quant" class="nf-metro-station-label">Salmon quant</text>
+<text x="657.5" y="211.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="hanging">FastQC filtered</text>
+<text x="657.5" y="211.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" data-station-id="qc_filtered" class="nf-metro-station-label">FastQC filtered</text>
+<text x="732.5" y="136.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="auto">tx2gene</text>
+<text x="732.5" y="136.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="auto" data-station-id="tx2gene" class="nf-metro-station-label">tx2gene</text>
+<text x="807.5" y="161.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="hanging">tximport</text>
+<text x="807.5" y="161.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="hanging" data-station-id="tximport" class="nf-metro-station-label">tximport</text>
+<text x="882.5" y="136.0" font-size="13.0" fill="#2b2b2b" stroke="#2b2b2b" stroke-width="3.0" stroke-linejoin="round" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" aria-hidden="true" class="nf-metro-label-halo" text-anchor="middle" dominant-baseline="auto">Top 20 genes</text>
+<text x="882.5" y="136.0" font-size="13.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="auto" data-station-id="abundance" class="nf-metro-station-label">Top 20 genes</text>
+<rect x="22.0" y="330.0" width="283.30000000000007" height="120.0" rx="6" ry="6" fill="rgba(0, 0, 0, 0.3)" class="nf-metro-legend-bg" />
+<path d="M34.0,354.0 L58.0,354.0" stroke="#2d9ddd" stroke-width="3.0" stroke-linecap="round" />
+<text x="70.0" y="354.0" font-size="14.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" dy="0.3em" class="nf-metro-legend-text">Read preprocessing</text>
+<path d="M34.0,378.0 L58.0,378.0" stroke="#38b8bc" stroke-width="3.0" stroke-linecap="round" />
+<text x="70.0" y="378.0" font-size="14.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" dy="0.3em" class="nf-metro-legend-text">Quality control and reporting</text>
+<path d="M34.0,402.0 L58.0,402.0" stroke="#38be80" stroke-width="3.0" stroke-linecap="round" />
+<text x="70.0" y="402.0" font-size="14.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" dy="0.3em" class="nf-metro-legend-text">Gene expression</text>
+<path d="M34.0,426.0 L58.0,426.0" stroke="#ab6fd1" stroke-width="3.0" stroke-linecap="round" />
+<text x="70.0" y="426.0" font-size="14.0" fill="#e0e0e0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" dy="0.3em" class="nf-metro-legend-text">Reference preparation</text>
+<text x="1165.0" y="466.0" font-size="8" fill="rgba(150, 150, 150, 0.6)" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" text-anchor="end">created with nf-metro v2.1.0</text>
+</svg>

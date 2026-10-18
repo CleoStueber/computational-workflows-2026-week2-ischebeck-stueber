@@ -1,0 +1,78 @@
+
+%%metro title: nf-core/rnaseqischebeckstueber | RNA-seq workflow
+%%metro style: dark
+%%metro legend: bl
+%%metro line_order: definition
+%%metro compact_offsets: true
+%%metro x_spacing: 75
+%%metro y_spacing: 50
+
+%%metro line: reads | Read preprocessing | #2d9ddd
+%%metro line: qc | Quality control and reporting | #38b8bc
+%%metro line: genes | Gene expression | #38be80
+%%metro line: ref | Reference preparation | #ab6fd1
+%%metro file: raw | FASTQ | Raw reads
+%%metro file: annotation | GTF / GTF.zip | Annotation files
+%%metro file: genome | FASTA | Reference genome
+%%metro file: multiqc | HTML | MultiQC report
+
+graph LR
+
+    subgraph pipeline [RNA-seq workflow]
+
+        raw[ ]
+        cat_fastq[CAT_FASTQ]
+
+        %% STEP 1: PREPROCESSING
+        fastp[fastp]
+        ribo[RiboDetector]
+
+        qc_raw[FastQC raw]
+        qc_trim[FastQC trimmed]
+        qc_filtered[FastQC filtered]
+
+        %% STEP 2: QUANTIFICATION
+        salmon_quant[Salmon quant]
+        tx2gene[tx2gene]
+        tximport[tximport]
+        abundance[Top 20 genes]
+        multiqc[MultiQC]
+
+        %% REFERENCE PREPARATION — BOTTOM TRACK
+        genome[ ]
+        annotation[ ]
+
+        filter_gtf[Filter GTF]
+        gffread[GffRead]
+        salmon_index[Salmon index]
+
+        %% MAIN READ PATH
+        raw -->|reads| cat_fastq
+        cat_fastq -->|reads| fastp
+        fastp -->|reads| ribo
+        ribo -->|reads| salmon_quant
+
+        %% REFERENCE PREPARATION
+        genome -->|ref| filter_gtf
+        annotation -->|ref| filter_gtf
+
+        filter_gtf -->|ref| gffread
+        gffread -->|ref| salmon_index
+        salmon_index -->|ref| salmon_quant
+
+        %% QUANTIFICATION
+        salmon_quant -->|genes| tx2gene
+        tx2gene -->|genes| tximport
+        tximport -->|genes| abundance
+        abundance -->|genes| multiqc
+
+        %% QUALITY CONTROL
+        cat_fastq -->|qc| qc_raw
+        fastp -->|qc| qc_trim
+        ribo -->|qc| qc_filtered
+
+        qc_raw -->|qc| qc_trim
+        qc_trim -->|qc| qc_filtered
+        qc_filtered -->|qc| multiqc
+
+    end
