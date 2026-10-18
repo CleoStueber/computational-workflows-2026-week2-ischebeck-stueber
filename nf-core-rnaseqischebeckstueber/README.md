@@ -30,18 +30,27 @@ This RNA-seq pipeline was developed using [Nextflow](https://www.nextflow.io/) a
 
 The pipeline produces QC reports, expression matrices, and a MultiQC report containing a table of the 20 genes with the highest mean TPM across samples. It does not currently perform differential expression analysis.
 
+## Pipeline overview
+
+The metro map below provides a schematic overview of our custom RNA-seq pipeline, illustrating read preprocessing, quality control, reference preparation, Salmon-based transcript quantification, gene-level expression analysis, and MultiQC reporting.
+
+![RNA-seq pipeline metro map](metro_horizontal_final.svg)
+
+The visualization was generated using `nf-metro`. The corresponding source file is available in [`metro_horizontal.mmd`](metro_horizontal.mmd).
+
 ## Pipeline steps
 
-1. Check raw reads with [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
-2. Trim adapters and low-quality bases using [fastp](https://github.com/OpenGene/fastp).
-3. Run FastQC on trimmed reads.
-4. Remove rRNA reads using [RiboDetector](https://github.com/hzi-bifo/RiboDetector).
-5. Run FastQC on rRNA-filtered reads.
-6. Prepare the reference by filtering the GTF annotation, extracting transcript sequences with [GFFRead](https://github.com/gpertea/gffread), and building a Salmon index.
-7. Quantify transcript abundance using [Salmon](https://salmon.readthedocs.io/). Library strandedness is automatically detected by Salmon if not specified.
-8. Generate transcript- and gene-level expression matrices using [tximport](https://bioconductor.org/packages/tximport/) / [tximeta](https://bioconductor.org/packages/tximeta/).
-9. Calculate the 20 genes with the highest mean TPM across samples (`GENE_ABUNDANCE`).
-10. Combine QC results, pipeline parameters, software versions, and the gene abundance summary in [MultiQC](https://multiqc.info/).
+1. Concatenate FASTQ files belonging to the same sample using `CAT_FASTQ`.
+2. Check raw reads with [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+3. Trim adapters and low-quality bases using [fastp](https://github.com/OpenGene/fastp).
+4. Run FastQC on trimmed reads.
+5. Remove rRNA reads using [RiboDetector](https://github.com/hzi-bifo/RiboDetector).
+6. Run FastQC on rRNA-filtered reads.
+7. Prepare the reference by filtering the GTF annotation, extracting transcript sequences with [GFFRead](https://github.com/gpertea/gffread), and building a Salmon index.
+8. Quantify transcript abundance using [Salmon](https://salmon.readthedocs.io/). Library strandedness is automatically detected by Salmon if not specified.
+9. Generate transcript- and gene-level expression matrices using [tximport](https://bioconductor.org/packages/tximport/) / [tximeta](https://bioconductor.org/packages/tximeta/).
+10. Calculate the 20 genes with the highest mean TPM across samples (`GENE_ABUNDANCE`).
+11. Combine QC results, pipeline parameters, software versions, and the gene abundance summary in [MultiQC](https://multiqc.info/).
 
 ## Usage
 

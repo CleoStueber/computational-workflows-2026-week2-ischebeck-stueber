@@ -1,12 +1,7 @@
 #!/usr/bin/env nextflow
 /*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    nf-core/rnaseqischebeckstueber
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/nf-core/rnaseqischebeckstueber
-    Website: https://nf-co.re/rnaseqischebeckstueber
-    Slack  : https://nfcore.slack.com/channels/rnaseqischebeckstueber
-----------------------------------------------------------------------------------------
+    RNA-seq workflow - Ischebeck & Stüber
+    GitHub: https://github.com/CleoStueber/computational-workflows-2026-week2-ischebeck-stueber
 */
 
 /*
