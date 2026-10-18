@@ -244,8 +244,6 @@ workflow RNASEQISCHEBECKSTUEBER {
 
     GENE_ABUNDANCE(TXIMETA_TXIMPORT.out.tpm_gene)
 
-    // DE Seq 2 PCA
-
     ch_multiqc_files = ch_multiqc_files.mix(
         GENE_ABUNDANCE.out
     )

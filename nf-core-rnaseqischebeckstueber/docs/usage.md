@@ -1,20 +1,23 @@
 # nf-core/rnaseqischebeckstueber: Usage
 
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/rnaseqischebeckstueber/usage](https://nf-co.re/rnaseqischebeckstueber/usage)
-
-> _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
-
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
+The pipeline requires a comma-separated samplesheet specified using `--input`. The columns `sample` and `fastq_1` are required, while `fastq_2` and `strandedness` are optional. Single-end and paired-end data are supported.
+
+The optional `strandedness` column accepts `forward`, `reverse`, `unstranded`, or `auto`. If omitted or set to `auto`, library strandedness is inferred automatically.
+
 
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.
+Create a comma-separated samplesheet with a header row and specify its location using `--input`.
+Use this parameter to specify its location. 
+It must be a comma-separated file with a header row. The columns sample and fastq_1 are required, while fastq_2 and strandedness are optional.
 
 ```bash
 --input '[path to samplesheet file]'
 ```
+
+The columns `sample` and `fastq_1` are required. The columns `fastq_2` and `strandedness` are optional.
 
 ### Multiple runs of the same sample
 
@@ -29,35 +32,40 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
+The pipeline automatically determines whether reads are single-end or paired-end based on the `fastq_2` column. If this column is empty or omitted, the sample is treated as single-end.
 
-A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
+Library strandedness can optionally be specified. If `strandedness` is missing or set to `auto`, the pipeline infers it automatically using subsampled reads and Salmon.
+
+An example samplesheet containing both single-end and paired-end data:
 
 ```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
+sample,fastq_1,fastq_2,strandedness
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,auto
+CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz,reverse
+CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz,auto
+TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,,auto
+TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,,reverse
+TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,,auto
+TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,,auto
 ```
 
-| Column    | Description                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| Column | Required | Description |
+|---|---|---|
+| `sample` | Yes | Sample identifier without spaces. Identical for multiple runs of the same sample. |
+| `fastq_1` | Yes | Path to the first FASTQ file (`.fastq.gz` or `.fq.gz`). |
+| `fastq_2` | No | Path to the second FASTQ file for paired-end sequencing. Leave empty for single-end reads. |
+| `strandedness` | No | Library strandedness: `forward`, `reverse`, `unstranded`, or `auto`. Missing or `auto` values trigger automatic inference. |
 
-An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
+FASTQ files must be gzip-compressed and accessible to the pipeline. Repeated runs of the same sample should have consistent strandedness annotations.
+
+An [example samplesheet](../assets/test_samplesheet_full.csv) has been provided with the pipeline.
 
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/rnaseqischebeckstueber --input ./samplesheet.csv --outdir ./results --genome GRCh37 -profile docker
+nextflow run . -profile docker -params-file params.yaml
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -67,7 +75,7 @@ Note that the pipeline will create the following files in your working directory
 ```bash
 work                # Directory containing the nextflow working files
 <OUTDIR>            # Finished results in specified location (defined with --outdir)
-.nextflow_log       # Log file from Nextflow
+.nextflow.log       # Log file from Nextflow
 # Other nextflow hidden files, eg. history of pipeline runs and old logs.
 ```
 
@@ -81,35 +89,41 @@ Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <
 The above pipeline run specified with a params file in yaml format:
 
 ```bash
-nextflow run nf-core/rnaseqischebeckstueber -profile docker -params-file params.yaml
+nextflow run . -profile docker -params-file params.yaml
 ```
 
 with:
 
 ```yaml title="params.yaml"
-input: './samplesheet.csv'
-outdir: './results/'
-genome: 'GRCh37'
-<...>
+input: './test_samplesheet_full.csv'
+outdir: './results'
+fasta: './reference.fa'
+gtf: './annotation.gtf'
 ```
 
 You can also generate such `YAML`/`JSON` files via [nf-core/launch](https://nf-co.re/launch).
 
 ### Updating the pipeline
 
-When you run the above command, Nextflow automatically pulls the pipeline code from GitHub and stores it as a cached version. When running the pipeline after this, it will always use the cached version if available - even if the pipeline has been updated since. To make sure that you're running the latest version of the pipeline, make sure that you regularly update the cached version of the pipeline:
+
+When running the pipeline locally using `nextflow run .`, Nextflow uses the code from the current project directory.
+
+To update the pipeline from its Git repository, run:
 
 ```bash
-nextflow pull nf-core/rnaseqischebeckstueber
+git pull
 ```
+
+The updated pipeline can then be executed using `nextflow run .`.
+`
 
 ### Reproducibility
 
-It is a good idea to specify the pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
+To ensure reproducibility, the exact pipeline version, input data, reference files, parameters, and software environments should be recorded.
 
-First, go to the [nf-core/rnaseqischebeckstueber releases page](https://github.com/nf-core/rnaseqischebeckstueber/releases) and find the latest pipeline version - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`. Of course, you can switch to another version by changing the number after the `-r` flag.
+The pipeline is version-controlled using Git. Specific commits or release tags allow users to retrieve the same pipeline code for subsequent analyses.
 
-This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at the bottom of the MultiQC reports.
+Software dependencies are managed using containers or Conda environments. Nextflow also records execution parameters, software versions, and resource usage to support reproducibility.
 
 To further assist in reproducibility, you can use share and reuse [parameter files](#running-the-pipeline) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
 
@@ -171,7 +185,9 @@ Specify the path to a specific config file (this is a core Nextflow command). Se
 
 ### Resource requests
 
-Whilst the default requirements set within the pipeline will hopefully work for most people and with most input data, you may find that you want to customise the compute resources that the pipeline requests. Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the pipeline steps, if the job exits with any of the error codes specified [here](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/base.config#L18) it will automatically be resubmitted with higher resources request (2 x original, then 3 x original). If it still fails after the third attempt then the pipeline execution is stopped.
+Each pipeline process has default CPU, memory, and time requirements defined in `conf/base.config`. Resource allocations can be adjusted for different computing environments.
+
+By default, processes can be retried once for specified exit codes, with resource requests increasing according to the retry attempt. Processes using the `error_retry` label allow up to two retries.
 
 To change the resource requests, please see the [max resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#set-max-resources) and [customise process resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#customize-process-resources) section of the nf-core website.
 
