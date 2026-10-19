@@ -2,229 +2,163 @@
 
 ## Introduction
 
-The pipeline requires a comma-separated samplesheet specified using `--input`. The columns `sample` and `fastq_1` are required, while `fastq_2` and `strandedness` are optional. Single-end and paired-end data are supported.
+The pipeline accepts single-end and paired-end RNA-seq reads in gzip-compressed FASTQ files. It requires a samplesheet (`--input`) and a matching genome FASTA and GTF annotation, supplied with `--fasta` and `--gtf` or selected using `--genome`.
 
-The optional `strandedness` column accepts `forward`, `reverse`, `unstranded`, or `auto`. If omitted, left empty, or set to `auto`, Salmon automatically detects the library type during quantification.
+RiboDetector is enabled by default. Use `--skip_ribodetector` to quantify trimmed reads without rRNA filtering.
 
+Pipeline parameters are defined in [`nextflow_schema.json`](../nextflow_schema.json).
 
 ## Samplesheet input
 
-Create a comma-separated samplesheet with a header row and specify its location using `--input`.
-Use this parameter to specify its location. 
-It must be a comma-separated file with a header row. The columns sample and fastq_1 are required, while fastq_2 and strandedness are optional.
+Specify a comma-separated samplesheet with a header row:
 
 ```bash
---input '[path to samplesheet file]'
+--input 'samplesheet.csv'
 ```
-
-The columns `sample` and `fastq_1` are required. The columns `fastq_2` and `strandedness` are optional.
 
 ### Multiple runs of the same sample
 
-The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
+Use the same `sample` name for sequencing runs belonging to one biological sample. The pipeline concatenates their FASTQ files before preprocessing.
 
-```csv title="samplesheet.csv"
+```csv
 sample,fastq_1,fastq_2
 CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
 CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 ```
+
+Runs assigned to the same sample must have consistent read type (single-end or paired-end) and strandedness.
 
 ### Full samplesheet
 
-The pipeline automatically determines whether reads are single-end or paired-end based on the `fastq_2` column. If this column is empty or omitted, the sample is treated as single-end.
+The `fastq_2` column determines whether a sample is paired-end. Leave it empty, or omit it, for single-end data. The optional `strandedness` column can contain `forward`, `reverse`, `unstranded`, or `auto`.
 
-Library strandedness can optionally be specified. If it is missing, empty, or set to `auto`, Salmon automatically detects the library type during quantification.
-
-An example samplesheet containing both single-end and paired-end data:
-
-```csv title="samplesheet.csv"
+```csv
 sample,fastq_1,fastq_2,strandedness
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,auto
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz,reverse
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz,auto
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,,auto
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,,reverse
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,,auto
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,,auto
+CONTROL_REP1,control_R1.fastq.gz,control_R2.fastq.gz,auto
+CONTROL_REP2,control2_R1.fastq.gz,control2_R2.fastq.gz,reverse
+TREATMENT_REP1,treatment.fastq.gz,,auto
 ```
 
 | Column | Required | Description |
-|---|---|---|
-| `sample` | Yes | Sample identifier without spaces. Identical for multiple runs of the same sample. |
-| `fastq_1` | Yes | Path to the first FASTQ file (`.fastq.gz` or `.fq.gz`). |
-| `fastq_2` | No | Path to the second FASTQ file for paired-end sequencing. Leave empty for single-end reads. |
-| `strandedness` | No | Library strandedness: `forward`, `reverse`, `unstranded`, or `auto`. Missing, empty, or `auto` values trigger automatic detection by Salmon. |
+| --- | --- | --- |
+| `sample` | Yes | Sample ID without spaces; identical for runs of the same sample. |
+| `fastq_1` | Yes | First read file (`.fastq.gz` or `.fq.gz`). |
+| `fastq_2` | No | Second read file for paired-end data. |
+| `strandedness` | No | `forward`, `reverse`, `unstranded`, or `auto`. |
 
-FASTQ files must be gzip-compressed and accessible to the pipeline. Repeated runs of the same sample should have consistent strandedness annotations.
+If strandedness is missing, empty, or `auto`, Salmon detects the library type during quantification.
 
-An [example samplesheet](../test_samplesheet_full.csv) has been provided with the pipeline.
+An [example samplesheet](../assets/samplesheet.csv) is included in the repository. The example paths must be replaced with real FASTQ paths.
 
 ## Running the pipeline
 
-The typical command for running the pipeline is as follows:
+Run the pipeline from the repository root using Nextflow 25.10.4 or later:
+
+```bash
+nextflow run . \
+    -profile docker \
+    --input samplesheet.csv \
+    --fasta reference.fa \
+    --gtf annotation.gtf \
+    --outdir results
+```
+
+Replace the file paths with your own. Instead of `--fasta` and `--gtf`, you can use a reference configured in `conf/igenomes.config`, for example `--genome GRCm38`.
+
+The working directory contains `work/` (intermediate files), `.nextflow.log` (run log), and other Nextflow cache files. Published outputs are saved under `--outdir`.
+
+To reuse parameters, create a YAML or JSON file and provide it with `-params-file`:
 
 ```bash
 nextflow run . -profile docker -params-file params.yaml
 ```
 
-This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
-
-Note that the pipeline will create the following files in your working directory:
-
-```bash
-work                # Directory containing the nextflow working files
-<OUTDIR>            # Finished results in specified location (defined with --outdir)
-.nextflow.log       # Log file from Nextflow
-# Other nextflow hidden files, eg. history of pipeline runs and old logs.
-```
-
-If you wish to repeatedly use the same parameters for multiple runs, rather than specifying each flag in the command, you can specify these in a params file.
-
-Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
-
-> [!WARNING]
-> Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/running/run-pipelines#configuring-pipelines), other infrastructural tweaks (such as output directories), or module arguments (args).
-
-The above pipeline run specified with a params file in yaml format:
-
-```bash
-nextflow run . -profile docker -params-file params.yaml
-```
-
-with:
-
-```yaml title="params.yaml"
-input: './test_samplesheet_full.csv'
-outdir: './results'
+```yaml
+input: './samplesheet.csv'
 fasta: './reference.fa'
 gtf: './annotation.gtf'
+outdir: './results'
 ```
 
-You can also generate such `YAML`/`JSON` files via [nf-core/launch](https://nf-co.re/launch).
+> [!WARNING]
+> Supply pipeline parameters on the command line or with `-params-file`, not with `-c`. Custom config files (`-c`) are intended for Nextflow configuration, such as resource settings.
+
+Test the pipeline with the included small dataset:
+
+```bash
+nextflow run . -profile test,docker --outdir results_test
+nextflow run . -profile test_skip_ribodetector,docker --outdir results_test_skip_ribo
+```
+
+Both test profiles use public nf-core test data. The `test_full` profile uses two mouse samples but requires FASTQ files outside the repository (see `test_samplesheet_full.csv`); it is not a standalone test.
 
 ### Updating the pipeline
 
-
-When running the pipeline locally using `nextflow run .`, Nextflow uses the code from the current project directory.
-
-To update the pipeline from its Git repository, run:
+For a local clone, update the code from its Git repository with:
 
 ```bash
 git pull
 ```
 
-The updated pipeline can then be executed using `nextflow run .`.
-`
-
 ### Reproducibility
 
-To ensure reproducibility, the exact pipeline version, input data, reference files, parameters, and software environments should be recorded.
+Record the Git commit or release tag, input accessions, genome and annotation versions, parameter file, and software environment. The pipeline collects software versions and Nextflow execution reports under `pipeline_info/`.
 
-The pipeline is version-controlled using Git. Specific commits or release tags allow users to retrieve the same pipeline code for subsequent analyses.
-
-Software dependencies are managed using containers or Conda environments. Nextflow also records execution parameters, software versions, and resource usage to support reproducibility.
-
-To further assist in reproducibility, you can use share and reuse [parameter files](#running-the-pipeline) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
-
-> [!TIP]
-> If you wish to share such profile (such as upload as supplementary material for academic publications), make sure to NOT include cluster specific paths to files, nor institutional specific profiles.
+Retaining `work/` and Nextflow's cache allows completed tasks to be reused with `-resume`.
 
 ## Core Nextflow arguments
 
 > [!NOTE]
-> These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen)
+> Nextflow options use a single hyphen (`-profile`, `-resume`); pipeline parameters use two (`--input`, `--outdir`).
 
 ### `-profile`
 
-Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments.
+Choose the execution environment and optional test configuration. Profiles are applied from left to right, so later profiles may override earlier settings.
 
-Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity, Podman, Shifter, Charliecloud, Apptainer, Conda) - see below.
+- `docker`: Run tools in Docker containers.
+- `conda`, `singularity`, `apptainer` (and other supported profiles): Alternative software environments.
+- `test`: Small test using RiboDetector.
+- `test_skip_ribodetector`: Small test without RiboDetector.
+- `test_full`: Two mouse RNA-seq samples; requires external FASTQ files.
 
-> [!IMPORTANT]
-> We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
-
-The pipeline also dynamically loads configurations from [https://github.com/nf-core/configs](https://github.com/nf-core/configs) when it runs, making multiple config profiles for various institutional clusters available at run time. For more information and to check if your system is supported, please see the [nf-core/configs documentation](https://github.com/nf-core/configs#documentation).
-
-Note that multiple profiles can be loaded, for example: `-profile test,docker` - the order of arguments is important!
-They are loaded in sequence, so later profiles can overwrite earlier profiles.
-
-If `-profile` is not specified, the pipeline will run locally and expect all software to be installed and available on the `PATH`. This is _not_ recommended, since it can lead to different results on different machines dependent on the computer environment.
-
-- `test`
-  - A profile with a complete configuration for automated testing
-  - Includes links to test data so needs no other parameters
-- `docker`
-  - A generic configuration profile to be used with [Docker](https://docker.com/)
-- `singularity`
-  - A generic configuration profile to be used with [Singularity](https://sylabs.io/docs/)
-- `podman`
-  - A generic configuration profile to be used with [Podman](https://podman.io/)
-- `shifter`
-  - A generic configuration profile to be used with [Shifter](https://nersc.gitlab.io/development/shifter/how-to-use/)
-- `charliecloud`
-  - A generic configuration profile to be used with [Charliecloud](https://charliecloud.io/)
-- `apptainer`
-  - A generic configuration profile to be used with [Apptainer](https://apptainer.org/)
-- `wave`
-  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow `24.03.0-edge` or later).
-- `conda`
-  - A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter, Charliecloud, or Apptainer.
+For reproducibility, a container profile such as `docker` is recommended over using software installed directly on the host.
 
 ### `-resume`
 
-Specify this when restarting a pipeline. Nextflow will use cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously. For input to be considered the same, not only the names must be identical but the files' contents as well. For more info about this parameter, see [this blog post](https://www.nextflow.io/blog/2019/demystifying-nextflow-resume.html).
-
-You can also supply a run name to resume a specific run: `-resume [run-name]`. Use the `nextflow log` command to show previous run names.
+Add `-resume` to reuse cached tasks from a previous run when their inputs, commands and environment have not changed. The corresponding work files must still be available.
 
 ### `-c`
 
-Specify the path to a specific config file (this is a core Nextflow command). See the [nf-core website documentation](https://nf-co.re/usage/configuration) for more information.
+Use `-c custom.config` for custom Nextflow configuration, such as executor or resource settings. See the [nf-core configuration guide](https://nf-co.re/docs/running/configuration/nextflow-for-your-system).
 
 ## Custom configuration
 
 ### Resource requests
 
-Each pipeline process has default CPU, memory, and time requirements defined in `conf/base.config`. Resource allocations can be adjusted for different computing environments.
-
-By default, processes can be retried once for specified exit codes, with resource requests increasing according to the retry attempt. Processes using the `error_retry` label allow up to two retries.
-
-To change the resource requests, please see the [max resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#set-max-resources) and [customise process resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#customize-process-resources) section of the nf-core website.
+Default CPU, memory and time settings are defined in `conf/base.config`. Processes may retry with increased resources after certain errors. Resource limits can be adjusted for the available computer or cluster.
 
 ### Custom Containers
 
-In some cases, you may wish to change the container or conda environment used by a pipeline steps for a particular tool. By default, nf-core pipelines use containers and software from the [biocontainers](https://biocontainers.pro/) or [bioconda](https://bioconda.github.io/) projects. However, in some cases the pipeline specified version maybe out of date.
-
-To use a different container from the default container or conda environment specified in a pipeline, please see the [updating tool versions](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#update-tool-versions) section of the nf-core website.
+The pipeline uses containers or Conda environments defined by its modules. See the [nf-core guide](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#update-tool-versions) before changing tool versions.
 
 ### Custom Tool Arguments
 
-A pipeline might not always support every possible argument or option of a particular tool used in pipeline. Fortunately, nf-core pipelines provide some freedom to users to insert additional parameters that the pipeline does not include by default.
-
-To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) section of the nf-core website.
+Additional module arguments can be supplied through Nextflow configuration where supported. See the [nf-core guide](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments).
 
 ### nf-core/configs
 
-In most cases, you will only need to create a custom config as a one-off but if you and others within your organisation are likely to be running nf-core pipelines regularly and need to use the same settings regularly it may be a good idea to request that your custom config file is uploaded to the `nf-core/configs` git repository. Before you do this please can you test that the config file works with your pipeline of choice using the `-c` parameter. You can then create a pull request to the `nf-core/configs` repository with the addition of your config file, associated documentation file (see examples in [`nf-core/configs/docs`](https://github.com/nf-core/configs/tree/master/docs)), and amending [`nfcore_custom.config`](https://github.com/nf-core/configs/blob/master/nfcore_custom.config) to include your custom profile.
-
-See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for more information about creating your own configuration files.
-
-If you have any questions or issues please send us a message on [Slack](https://nf-co.re/join/slack) on the [`#configs` channel](https://nfcore.slack.com/channels/configs).
+The pipeline can load institutional profiles from [`nf-core/configs`](https://github.com/nf-core/configs). Check that the selected profile is available for your computing environment.
 
 ## Running in the background
 
-Nextflow handles job submissions and supervises the running jobs. The Nextflow process must run until the pipeline is finished.
-
-The Nextflow `-bg` flag launches Nextflow in the background, detached from your terminal so that the workflow does not stop if you log out of your session. The logs are saved to a file.
-
-Alternatively, you can use `screen` / `tmux` or similar tool to create a detached session which you can log back into at a later time.
-Some HPC setups also allow you to run nextflow within a cluster job submitted your job scheduler (from where it submits more jobs).
+Nextflow must remain running until the workflow completes. Use `-bg` to launch it in the background, or run it within a `tmux` or `screen` session.
 
 ## Nextflow memory requirements
 
-In some cases, the Nextflow Java virtual machines can start to request a large amount of memory.
-We recommend adding the following line to your environment to limit this (typically in `~/.bashrc` or `~./bash_profile`):
+If the Nextflow Java process needs a memory limit, set `NXF_OPTS` before starting the pipeline, for example:
 
 ```bash
-NXF_OPTS='-Xms1g -Xmx4g'
+export NXF_OPTS='-Xms1g -Xmx4g'
 ```
+
+This limits Nextflow's Java heap, not the memory allocated to individual pipeline processes.

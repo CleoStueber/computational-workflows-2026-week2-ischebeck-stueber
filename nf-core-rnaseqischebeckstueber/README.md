@@ -6,12 +6,11 @@
 </h1>
 
 [![Open in GitHub Codespaces](https://img.shields.io/badge/Open_In_GitHub_Codespaces-black?labelColor=grey&logo=github)](https://github.com/codespaces/new/nf-core/rnaseqischebeckstueber)
-[![GitHub Actions CI Status](https://github.com/nf-core/rnaseqischebeckstueber/actions/workflows/nf-test.yml/badge.svg)](https://github.com/nf-core/rnaseqischebeckstueber/actions/workflows/nf-test.yml)
-[![GitHub Actions Linting Status](https://github.com/nf-core/rnaseqischebeckstueber/actions/workflows/linting.yml/badge.svg)](https://github.com/nf-core/rnaseqischebeckstueber/actions/workflows/linting.yml)
+[![GitHub Actions CI Status](https://github.com/CleoStueber/computational-workflows-2026-week2-ischebeck-stueber/actions/workflows/nf-test.yml/badge.svg)](https://github.com/CleoStueber/computational-workflows-2026-week2-ischebeck-stueber/actions/workflows/nf-test.yml)
+[![GitHub Actions Linting Status](https://github.com/CleoStueber/computational-workflows-2026-week2-ischebeck-stueber/actions/workflows/linting.yml/badge.svg)](https://github.com/CleoStueber/computational-workflows-2026-week2-ischebeck-stueber/actions/workflows/linting.yml)
 [![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/rnaseqischebeckstueber/results)
 [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
 [![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
-
 [![Nextflow](https://img.shields.io/badge/version-%E2%89%A525.10.4-green?style=flat&logo=nextflow&logoColor=white&color=%230DC09D&link=https%3A%2F%2Fnextflow.io)](https://www.nextflow.io/)
 [![nf-core template version](https://img.shields.io/badge/nf--core_template-4.1.0-green?style=flat&logo=nfcore&logoColor=white&color=%2324B064&link=https%3A%2F%2Fnf-co.re)](https://github.com/nf-core/tools/releases/tag/4.1.0)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
@@ -24,125 +23,85 @@
 [![Follow on Mastodon](https://img.shields.io/badge/mastodon-nf__core-6364ff?labelColor=FFFFFF&logo=mastodon)](https://mstdn.science/@nf_core)
 [![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)
 
+
 ## Introduction
 
-This RNA-seq pipeline was developed using [Nextflow](https://www.nextflow.io/) and the [nf-core](https://nf-co.re/) pipeline template. It processes single-end and paired-end RNA-seq FASTQ reads, performs quality control and preprocessing, removes ribosomal RNA reads, and quantifies transcript abundance using Salmon. It then generates transcript- and gene-level expression matrices using tximport/tximeta.
-
-The pipeline produces QC reports, expression matrices, and a MultiQC report containing a table of the 20 genes with the highest mean TPM across samples. It does not currently perform differential expression analysis.
-
-## Pipeline overview
-
-The metro map below provides a schematic overview of our custom RNA-seq pipeline, illustrating read preprocessing, quality control, reference preparation, Salmon-based transcript quantification, gene-level expression analysis, and MultiQC reporting.
+**rnaseqischebeckstueber** is a Nextflow RNA-seq pipeline built using the nf-core template and modules. It processes single-end and paired-end FASTQ reads, performs quality control and trimming, optionally removes rRNA reads, and quantifies transcripts with Salmon. It produces gene- and transcript-level expression matrices and a MultiQC report. Differential expression analysis is not included.
 
 ![RNA-seq pipeline metro map](metro_horizontal_final.svg)
 
-The visualization was generated using `nf-metro`. The corresponding source file is available in [`metro_horizontal.mmd`](metro_horizontal.mmd).
+Diagram generated with `nf-metro` ([source](metro_horizontal.mmd)).
 
-## Pipeline steps
+The main pipeline steps are:
 
-1. Concatenate FASTQ files belonging to the same sample using `CAT_FASTQ`.
+1. Merge sequencing runs belonging to the same sample (`CAT_FASTQ`).
 2. Check raw reads with [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
-3. Trim adapters and low-quality bases using [fastp](https://github.com/OpenGene/fastp).
-4. Run FastQC on trimmed reads.
-5. Remove rRNA reads using [RiboDetector](https://github.com/hzi-bifo/RiboDetector).
-6. Run FastQC on rRNA-filtered reads.
-7. Prepare the reference by filtering the GTF annotation, extracting transcript sequences with [GFFRead](https://github.com/gpertea/gffread), and building a Salmon index.
-8. Quantify transcript abundance using [Salmon](https://salmon.readthedocs.io/). Library strandedness is automatically detected by Salmon if not specified.
-9. Generate transcript- and gene-level expression matrices using [tximport](https://bioconductor.org/packages/tximport/) / [tximeta](https://bioconductor.org/packages/tximeta/).
-10. Calculate the 20 genes with the highest mean TPM across samples (`GENE_ABUNDANCE`).
-11. Combine QC results, pipeline parameters, software versions, and the gene abundance summary in [MultiQC](https://multiqc.info/).
+3. Trim reads with [fastp](https://github.com/OpenGene/fastp) and run FastQC again.
+4. Optionally remove rRNA reads with [RiboDetector](https://github.com/hzi-bifo/RiboDetector) and check the filtered reads with FastQC (`--skip_ribodetector` to skip).
+5. Filter the GTF annotation, extract transcripts with [Gffread](https://github.com/gpertea/gffread), and build a Salmon index.
+6. Quantify transcripts with [Salmon](https://salmon.readthedocs.io/) and generate gene- and transcript-level matrices with [tximport/tximeta](https://bioconductor.org/packages/tximeta/).
+7. Combine QC metrics, software versions, and the top 20 genes by mean TPM in [MultiQC](https://multiqc.info/).
 
 ## Usage
 
-### Requirements
+> [!NOTE]
+> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/get_started/environment_setup/overview) on how to set up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/get_started/run-your-first-pipeline) with `-profile test` before running the workflow on actual data.
 
-- Nextflow 25.10.4 or later, subject to the version requirement in `nextflow.config`.
-- A supported software environment, such as Docker.
-- A samplesheet with FASTQ inputs, and a matching genome FASTA and GTF annotation.
+First, prepare a CSV samplesheet with your FASTQ files:
 
-### Input samplesheet
-
-The samplesheet is a CSV file containing sample names and paths to gzip-compressed FASTQ files.
-
-Paired-end example (`samplesheet.csv`):
+`samplesheet.csv`:
 
 ```csv
-sample,fastq_1,fastq_2
-sample1,data/sample1_R1.fastq.gz,data/sample1_R2.fastq.gz
-sample2,data/sample2_R1.fastq.gz,data/sample2_R2.fastq.gz
+sample,fastq_1,fastq_2,strandedness
+sample1,data/sample1_R1.fastq.gz,data/sample1_R2.fastq.gz,auto
+sample2,data/sample2.fastq.gz,,auto
 ```
 
-Single-end example:
+Each row represents a single-end FASTQ file or a paired-end FASTQ pair. The `sample` and `fastq_1` columns are required; `fastq_2` and `strandedness` are optional. Repeated sample IDs are merged. Strandedness may be `forward`, `reverse`, `unstranded`, or `auto` (automatic detection by Salmon).
 
-```csv
-sample,fastq_1
-sample1,data/sample1.fastq.gz
-sample2,data/sample2.fastq.gz
-```
-
-- `sample`: sample name without spaces.
-- `fastq_1`: required path to the first FASTQ file.
-- `fastq_2`: optional path to the second FASTQ file for paired-end data.
-- `strandedness`: optional column with `forward`, `reverse`, `unstranded`, or `auto`. If omitted, left empty, or set to `auto`, Salmon automatically detects the library type during quantification.
-
-Files must end in `.fastq.gz` or `.fq.gz`. Multiple rows can have the same sample name when reads from more than one run belong to the same sample.
-
-A genome FASTA (`--fasta`) and a matching GTF annotation (`--gtf`) are also required. Use an uncompressed FASTA file with the current implementation of `FILTER_GTF`. Alternatively, `--genome` can select a reference configured in `conf/igenomes.config`.
-
-### Run the pipeline
-
-From the root of the cloned repository:
+Now, you can run the pipeline from the repository root using:
 
 ```bash
 nextflow run . \
-  -profile docker \
-  --input samplesheet.csv \
-  --fasta reference.fa \
-  --gtf annotation.gtf \
-  --outdir results
+    -profile docker \
+    --input samplesheet.csv \
+    --fasta reference.fa \
+    --gtf annotation.gtf \
+    --outdir results
 ```
 
-Replace the example paths with your files. To resume a previous run, add `-resume`; this reuses successfully completed tasks when their cache and work files are still available.
-
-### Run the included test
-
-The repository contains a small test dataset configured in `conf/test.config`. Run it from the repository root with:
+Replace the example paths with your FASTQ files and matching reference FASTA and GTF annotation. To run the small test dataset:
 
 ```bash
-nextflow run . -profile test,docker --outdir test_results
+nextflow run . -profile test,docker --outdir results_test
 ```
 
-The test profile uses small public FASTQ files and reference files from the nf-core test datasets. It tests pipeline execution but is not a substitute for analysis of a full experimental dataset.
+To test without RiboDetector, use `-profile test_skip_ribodetector,docker`. Add `-resume` to reuse cached tasks from an earlier run.
 
-For more information, see [usage documentation](docs/usage.md).
+> [!WARNING]
+> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/running/run-pipelines#using-parameter-files).
 
+For more details and further functionality, please refer to the [usage documentation](docs/usage.md) and the parameter descriptions in `nextflow_schema.json`.
 
 ## Pipeline output
 
-Results are saved under the directory specified with `--outdir`. The main outputs are:
+The output directory contains FastQC and fastp reports, optional RiboDetector results, Salmon quantification files, gene- and transcript-level expression matrices, and a MultiQC report. Execution reports and software versions are saved in `pipeline_info/`.
 
-- **Quality control and preprocessing:** FastQC reports for raw, trimmed, and rRNA-filtered reads; fastp statistics; and RiboDetector-filtered reads.
-- **Reference preparation:** filtered GTF annotation, transcript FASTA, Salmon index, and transcript-to-gene mapping.
-- **Transcript quantification:** Salmon quantification files, mapping statistics, and library-type information for each sample.
-- **Transcript expression matrices:** `*.transcript_counts.tsv`, `*.transcript_tpm.tsv`, and `*.transcript_lengths.tsv`.
-- **Gene expression matrices:** `*.gene_counts.tsv`, `*.gene_tpm.tsv`, `*.gene_lengths.tsv`, `*.gene_counts_length_scaled.tsv`, and `*.gene_counts_scaled.tsv`.
-- **Gene abundance summary:** `gene_abundance_mqc.tsv`, containing the 20 genes with the highest mean TPM across samples.
-- **MultiQC:** `multiqc/multiqc_report.html`, combining quality metrics and the gene abundance summary.
-- **Execution information:** reports, timeline, trace, workflow DAG, parameters, and software-version information in `pipeline_info/`.
-
-The expression matrices are produced using tximport/tximeta. Output subdirectories correspond to process names; examples include `fastqc_raw/`, `fastp/`, `ribodetector/`, `salmon_quant/`, and `tximeta_tximport/`.
-
-For details on the outputs, see [output documentation](docs/output.md).
+For more details about the output files and reports, please refer to the [output documentation](docs/output.md).
 
 ## Credits
 
-Developed by **Alexa Ischebeck** and **Cleo Stüber** for the *Computational Workflows for Biomedical Data* course (2026), using the nf-core pipeline template and existing nf-core modules.
+**rnaseqischebeckstueber** was developed by Alexa Ischebeck and Cleo Stüber for the *Computational Workflows for Biomedical Data* course (2026), using the nf-core pipeline template and existing nf-core modules.
 
 ## Contributions and Support
 
-If you would like to contribute to this pipeline, please see the [contributing guidelines](docs/CONTRIBUTING.md).
+If you would like to contribute to this pipeline, please see the [contributing guidelines](docs/CONTRIBUTING.md). For questions or issues, use the [project repository](https://github.com/CleoStueber/computational-workflows-2026-week2-ischebeck-stueber).
 
 ## Citations
+
+An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
+
+You can cite the `nf-core` publication as follows:
 
 > **The nf-core framework for community-curated bioinformatics pipelines.**
 >

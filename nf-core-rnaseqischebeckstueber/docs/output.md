@@ -2,26 +2,26 @@
 
 ## Introduction
 
-This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
+This document describes the output produced by the pipeline. Most QC results are summarised in the MultiQC report generated at the end of the run.
 
-The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
+The directories below are created in the results directory specified with `--outdir`. All paths are relative to this directory.
 
-In addition to quality control reports, the pipeline produces trimmed and rRNA-filtered reads, Salmon quantification results, and gene- and transcript-level expression matrices for downstream analysis.
+The pipeline produces processed reads, Salmon quantification results, and gene- and transcript-level expression matrices. rRNA-filtered reads are only produced when RiboDetector is enabled.
 
 ## Pipeline overview
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
-- [CAT_FASTQ](#cat_fastq) - Merge FASTQ files belonging to the same sample
-- [FastQC](#fastqc) - Quality control of raw, trimmed and rRNA-filtered reads
-- [fastp](#fastp) - Adapter trimming and read quality filtering
-- [RiboDetector](#ribodetector) - Identification and removal of rRNA reads
-- [Reference preparation](#reference-preparation) - Prepare the reference annotation, transcript sequences and Salmon index
-- [Salmon](#salmon) - Transcript quantification and automatic library-type detection when needed
-- [tximport](#tximport) - Combine quantification results into expression matrices
-- [Gene abundance](#gene-abundance) - Summary of the 20 genes with the highest mean TPM
-- [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
-- [Pipeline information](#pipeline-information) - Report metrics generated during workflow execution
+- [CAT_FASTQ](#cat_fastq) - Merge FASTQ files from the same sample
+- [FastQC](#fastqc) - Quality control of raw and processed reads
+- [fastp](#fastp) - Adapter trimming and quality filtering
+- [RiboDetector](#ribodetector) - Optional rRNA removal
+- [Reference preparation](#reference-preparation) - Prepare transcripts and the Salmon index
+- [Salmon](#salmon) - Transcript and gene quantification
+- [tximport](#tximport) - Generate expression matrices
+- [Gene abundance](#gene-abundance) - Report the top 20 genes by mean TPM
+- [MultiQC](#multiqc) - Summarise QC results
+- [Pipeline information](#pipeline-information) - Record run parameters and execution statistics
 
 ### CAT_FASTQ
 
@@ -33,21 +33,25 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 </details>
 
-CAT_FASTQ combines FASTQ files belonging to the same sample before further processing.
+CAT_FASTQ combines reads from multiple sequencing runs belonging to the same sample.
 
 ### FastQC
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `fastqc_raw/`: Quality reports for raw reads
-- `fastqc_trimmed/`: Quality reports after trimming
-- `fastqc_filtered/`: Quality reports after rRNA removal
-  - `*_fastqc.html`: FastQC report containing quality metrics
-  - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images
+- `fastqc_raw/`: QC reports before trimming.
+- `fastqc_trimmed/`: QC reports after trimming.
+- `fastqc_filtered/`: QC reports after rRNA removal (if enabled).
+
+Each directory contains:
+
+- `*_fastqc.html`: HTML quality report.
+- `*_fastqc.zip`: Report data and plots.
 
 </details>
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+
+[FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) reports read quality, sequence composition, adapter content and overrepresented sequences. The `fastqc_filtered/` directory is absent when `--skip_ribodetector` is used.
 
 ### fastp
 
@@ -55,14 +59,14 @@ CAT_FASTQ combines FASTQ files belonging to the same sample before further proce
 <summary>Output files</summary>
 
 - `fastp/`
-  - `*.fastp.fastq.gz`: Trimmed and quality-filtered reads.
+  - `*.fastp.fastq.gz`: Trimmed and filtered reads.
   - `*.fastp.html`: HTML quality report.
   - `*.fastp.json`: Quality statistics.
   - `*.fastp.log`: Processing log.
 
 </details>
 
-[fastp](https://github.com/OpenGene/fastp) performs adapter trimming and quality filtering of sequencing reads.
+[fastp](https://github.com/OpenGene/fastp) trims adapters and filters low-quality reads.
 
 ### RiboDetector
 
@@ -70,12 +74,12 @@ CAT_FASTQ combines FASTQ files belonging to the same sample before further proce
 <summary>Output files</summary>
 
 - `ribodetector/`
-  - `*.nonrna*.fastq.gz`: Reads remaining after rRNA filtering.
+  - `*.nonrna*.fastq.gz`: Reads retained after rRNA removal.
   - `*.log`: Processing log.
 
 </details>
 
-[RiboDetector](https://github.com/hzi-bifo/RiboDetector) identifies and removes predicted ribosomal RNA reads before quantification.
+[RiboDetector](https://github.com/hzi-bifo/RiboDetector) removes predicted rRNA reads before quantification. This step is enabled by default and can be disabled with `--skip_ribodetector`. When skipped, Salmon uses the fastp output directly.
 
 ### Reference preparation
 
@@ -83,17 +87,17 @@ CAT_FASTQ combines FASTQ files belonging to the same sample before further proce
 <summary>Output files</summary>
 
 - `filter_gtf/`
-  - `filtered.gtf`: Filtered gene annotation.
+  - `filtered.gtf`: Annotation restricted to contigs present in the reference FASTA.
 - `gffread/`
   - `reference.fasta`: Extracted transcript sequences.
 - `salmon_index/`
-  - `salmon/`: Salmon index files.
+  - `salmon/`: Salmon index.
 - `custom_tx2gene/`
   - `reference.tx2gene.tsv`: Transcript-to-gene mapping.
 
 </details>
 
-The reference annotation is filtered and transcript sequences are extracted using Gffread. These sequences are used to generate a Salmon index for quantification.
+The pipeline filters the GTF annotation, extracts transcript sequences using [Gffread](https://github.com/gpertea/gffread) and builds a Salmon index.
 
 ### Salmon
 
@@ -101,18 +105,16 @@ The reference annotation is filtered and transcript sequences are extracted usin
 <summary>Output files</summary>
 
 - `salmon_quant/`
-  - `<sample>/quant.sf`: Transcript-level abundance estimates.
-  - `<sample>/quant.genes.sf`: Gene-level abundance estimates.
+  - `<sample>/quant.sf`: Transcript abundance estimates.
+  - `<sample>/quant.genes.sf`: Gene abundance estimates.
   - `<sample>/aux_info/`: Additional quantification statistics.
-  - `<sample>/logs/`: Execution logs.
-  - `<sample>/lib_format_counts.json`: Counts of reads matching different library orientations.
-  - `<sample>/aux_info/meta_info.json`: Quantification statistics and detected library type.
+  - `<sample>/logs/`: Salmon logs.
+  - `<sample>/lib_format_counts.json`: Library orientation counts.
+  - `<sample>/aux_info/meta_info.json`: Mapping statistics and library-type information.
 
 </details>
 
-[Salmon](https://combine-lab.github.io/salmon/) estimates transcript and gene abundance from the processed sequencing reads.
-
-If library strandedness is missing, empty, or set to `auto`, Salmon automatically detects the library type during quantification using `--libType A`. Otherwise, the specified library type is used.
+[Salmon](https://salmon.readthedocs.io/) quantifies transcripts from processed reads. When strandedness is omitted or set to `auto`, Salmon detects the library type automatically.
 
 ### tximport
 
@@ -120,19 +122,19 @@ If library strandedness is missing, empty, or set to `auto`, Salmon automaticall
 <summary>Output files</summary>
 
 - `tximeta_tximport/`
-  - `salmon.gene_counts.tsv`: Gene-level counts.
-  - `salmon.gene_tpm.tsv`: Gene-level TPM values.
+  - `salmon.gene_counts.tsv`: Estimated gene counts.
+  - `salmon.gene_tpm.tsv`: Gene TPM values.
   - `salmon.gene_lengths.tsv`: Estimated gene lengths.
-  - `salmon.transcript_counts.tsv`: Transcript-level counts.
-  - `salmon.transcript_tpm.tsv`: Transcript-level TPM values.
-  - `salmon.transcript_lengths.tsv`: Transcript lengths.
-  - `salmon.tx2gene_augmented.tsv`: Transcript-to-gene mapping.
   - `salmon.gene_counts_scaled.tsv`: Scaled gene counts.
   - `salmon.gene_counts_length_scaled.tsv`: Length-scaled gene counts.
+  - `salmon.transcript_counts.tsv`: Estimated transcript counts.
+  - `salmon.transcript_tpm.tsv`: Transcript TPM values.
+  - `salmon.transcript_lengths.tsv`: Transcript lengths.
+  - `salmon.tx2gene_augmented.tsv`: Transcript-to-gene mapping.
 
 </details>
 
-[tximport](https://bioconductor.org/packages/tximport/) combines Salmon quantification results into gene- and transcript-level expression matrices for downstream analysis.
+[tximport](https://bioconductor.org/packages/tximport/) combines the Salmon results into expression matrices for downstream analysis.
 
 ### Gene abundance
 
@@ -140,12 +142,11 @@ If library strandedness is missing, empty, or set to `auto`, Salmon automaticall
 <summary>Output files</summary>
 
 - `gene_abundance/`
-  - `gene_abundance_mqc.tsv`: Gene abundance summary used by MultiQC.
+  - `gene_abundance_mqc.tsv`: Table used in the MultiQC report.
 
 </details>
 
-This step identifies the 20 genes with the highest mean TPM across samples and includes the results in the MultiQC report.
-
+This table lists the 20 genes with the highest mean TPM across samples.
 
 ### MultiQC
 
@@ -153,15 +154,13 @@ This step identifies the 20 genes with the highest mean TPM across samples and i
 <summary>Output files</summary>
 
 - `multiqc/`
-  - `multiqc_report.html`: a standalone HTML file that can be viewed in your web browser.
-  - `multiqc_data/`: directory containing parsed statistics from the different tools used in the pipeline.
+  - `multiqc_report.html`: Combined HTML report.
+  - `multiqc_data/`: Collected report data.
+  - `multiqc_plots/`: Exported plots, if generated.
 
 </details>
 
-[MultiQC](http://multiqc.info) is a visualization tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in the report data directory.
-
-Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQC. The pipeline has special steps which also allow the software versions to be reported in the MultiQC output for future traceability. For more information about how to use MultiQC reports, see <http://multiqc.info>.
-
+[MultiQC](https://multiqc.info/) combines FastQC, fastp and Salmon results with software versions and the gene abundance table.
 
 ### Pipeline information
 
@@ -169,14 +168,14 @@ Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQ
 <summary>Output files</summary>
 
 - `pipeline_info/`
-  - `execution_report_*.html`: Execution performance and resource usage.
-  - `execution_timeline_*.html`: Timeline of process execution.
+  - `execution_report_*.html`: Resource usage and execution performance.
+  - `execution_timeline_*.html`: Task execution timeline.
   - `execution_trace_*.txt`: Per-task execution statistics.
   - `pipeline_dag_*.html`: Workflow dependency graph.
-  - `params_*.json`: Parameters used during execution.
-  - `nf_core_rnaseqischebeckstueber_software_mqc_versions.yml`: Software versions collected by the pipeline.
-  - `pipeline_report.html` and `pipeline_report.txt`: Optional completion summaries generated when email reporting is configured.
+  - `params_*.json`: Parameters used for the run.
+  - `nf_core_rnaseqischebeckstueber_software_mqc_versions.yml`: Software versions.
+  - `pipeline_report.html` and `pipeline_report.txt`: Completion summaries, when email reporting is configured.
 
 </details>
 
-[Nextflow](https://docs.seqera.io/platform-cloud/reports/overview) provides excellent functionality for generating various reports relevant to the running and execution of the pipeline. This will allow you to troubleshoot errors with the running of the pipeline, and also provide you with other information such as launch commands, run times and resource usage.
+[Nextflow](https://www.nextflow.io/docs/latest/reports.html) generates execution reports for tracking runtime, resource use and workflow progress.
