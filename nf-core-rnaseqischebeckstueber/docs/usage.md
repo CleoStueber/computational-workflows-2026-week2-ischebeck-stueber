@@ -48,7 +48,7 @@ TREATMENT_REP1,treatment.fastq.gz,,auto
 
 If strandedness is missing, empty, or `auto`, Salmon detects the library type during quantification.
 
-An [example samplesheet](../assets/samplesheet.csv) is included in the repository. The example paths must be replaced with real FASTQ paths.
+An [example samplesheet](../assets/test_samplesheet_tiny.csv) is included in the repository. The example paths must be replaced with real FASTQ paths.
 
 ## Running the pipeline
 
@@ -90,7 +90,7 @@ nextflow run . -profile test,docker --outdir results_test
 nextflow run . -profile test_skip_ribodetector,docker --outdir results_test_skip_ribo
 ```
 
-Both test profiles use public nf-core test data. The `test_full` profile uses two mouse samples but requires FASTQ files outside the repository (see `test_samplesheet_full.csv`); it is not a standalone test.
+Both test profiles use public nf-core test data. The `test_full` profile uses two mouse samples but requires FASTQ files outside the repository.
 
 ### Updating the pipeline
 
