@@ -1,0 +1,15 @@
+{
+  "salmon_version": "2.7.0",
+  "index": "salmon",
+  "libType": "A",
+  "output": "WT_REP1",
+  "mates1": [
+    "WT_REP1.nonrna.1.fastq.gz"
+  ],
+  "mates2": [
+    "WT_REP1.nonrna.2.fastq.gz"
+  ],
+  "unmatedReads": [],
+  "threads": 6,
+  "sketch": false
+}

@@ -1,0 +1,30 @@
+Sample	fastp-pct_duplication	fastp-after_filtering_q30_rate	fastp-after_filtering_q30_bases	fastp-filtering_result_passed_filter_reads	fastp-after_filtering_gc_content	fastp-pct_surviving_reads	fastp-pct_surviving_bases	fastp-pct_adapter	fastp-before_filtering_read1_mean_length	fastp-before_filtering_read2_mean_length	fastqc_raw-percent_duplicates	fastqc_raw-percent_gc	fastqc_raw-avg_sequence_length	fastqc_raw-median_sequence_length	fastqc_raw-percent_fails	fastqc_raw-total_sequences	fastqc_trimmed-percent_duplicates	fastqc_trimmed-percent_gc	fastqc_trimmed-avg_sequence_length	fastqc_trimmed-median_sequence_length	fastqc_trimmed-percent_fails	fastqc_trimmed-total_sequences	fastqc_filtered-percent_duplicates	fastqc_filtered-percent_gc	fastqc_filtered-avg_sequence_length	fastqc_filtered-median_sequence_length	fastqc_filtered-percent_fails	fastqc_filtered-total_sequences
+RAP1_IAA_30M_REP1_R1.fastq.gz_RAP1_IAA_30M_REP1_R2.fastq.gz	7.12	93.72890000000001	8.953541999999999	0.095678	40.522999999999996	95.678	94.5801089108911	8.458	101.0	101.0																		
+RAP1_IAA_30M_REP1_filtered_1.gz																							66.73985780008366	40.0	99.38624006691761	100	20.0	0.047819999999999994
+RAP1_IAA_30M_REP1_filtered_2.gz																							67.74780426599749	40.0	99.38523630280217	100	20.0	0.047819999999999994
+RAP1_IAA_30M_REP1_raw_1.gz											65.4	40.0	101.0	101	20.0	0.049999999999999996												
+RAP1_IAA_30M_REP1_raw_2.gz											65.928	40.0	101.0	101	20.0	0.049999999999999996												
+RAP1_IAA_30M_REP1_trimmed_1.gz																	66.73425447856351	40.0	99.38588808294487	100	20.0	0.047839						
+RAP1_IAA_30M_REP1_trimmed_2.gz																	67.74180062292272	40.0	99.38488471748991	100	20.0	0.047839						
+RAP1_UNINDUCED_REP1.fastq.gz	53.622	93.5656	4.5625789999999995	0.048910999999999996	40.4344	97.822	96.56122772277229	7.696	101.0																			
+RAP1_UNINDUCED_REP1_filtered.gz																							66.42984377879242	40.0	99.23782273090231	100	20.0	0.048840999999999996
+RAP1_UNINDUCED_REP1_raw.gz											65.292	40.0	101.0	101	20.0	0.049999999999999996												
+RAP1_UNINDUCED_REP1_trimmed.gz																	66.40837439430803	40.0	99.23807527958945	100	20.0	0.048910999999999996						
+RAP1_UNINDUCED_REP2.fastq.gz	61.333000000000006	93.7731	9.176287	0.09806	40.4734	98.06	96.88737623762376	7.431	101.0																			
+RAP1_UNINDUCED_REP2_filtered.gz																							73.87037812337257	40.0	99.33105451797694	100	20.0	0.09793099999999999
+RAP1_UNINDUCED_REP2_raw.gz											72.74	40.0	101.0	101	20.0	0.09999999999999999												
+RAP1_UNINDUCED_REP2_trimmed.gz																	73.8466245156027	40.0	99.3303691617377	100	20.0	0.09806						
+WT_REP1_R1.fastq.gz_WT_REP1_R2.fastq.gz	12.307	93.7618	17.857343	0.190946	40.092299999999994	95.473	94.28433168316832	9.1775	101.0	101.0																		
+WT_REP1_filtered_1.gz																							76.62182549660548	40.0	99.29125806721984	100	20.0	0.09544799999999999
+WT_REP1_filtered_2.gz																							76.68049618640516	40.0	99.29182382030005	100	20.0	0.09544799999999999
+WT_REP1_raw_1.gz											75.072	40.0	101.0	101	20.0	0.09999999999999999												
+WT_REP1_raw_2.gz											74.463	40.0	101.0	101	20.0	0.09999999999999999												
+WT_REP1_trimmed_1.gz																	76.61328333665016	40.0	99.29033862976968	100	20.0	0.095473						
+WT_REP1_trimmed_2.gz																	76.67193866328701	40.0	99.2909042347051	100	20.0	0.095473						
+WT_REP2_R1.fastq.gz_WT_REP2_R2.fastq.gz	7.41	94.7262	9.054993999999999	0.095922	40.3832	95.922	94.64480198019803	9.885	101.0	101.0																		
+WT_REP2_filtered_1.gz																							68.9151700978245	40.0	99.20838287132636	100	20.0	0.047943
+WT_REP2_filtered_2.gz																							67.79300419247858	40.0	99.20880003337297	100	20.0	0.047943
+WT_REP2_raw_1.gz											67.856	40.0	101.0	101	20.0	0.049999999999999996												
+WT_REP2_raw_2.gz											66.176	40.0	101.0	101	20.0	0.049999999999999996												
+WT_REP2_trimmed_1.gz																	68.90598611371739	40.0	99.20811701173871	100	20.0	0.047961						
+WT_REP2_trimmed_2.gz																	67.78632639019203	40.0	99.20853401722232	100	20.0	0.047961						

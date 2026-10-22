@@ -1,0 +1,26 @@
+{
+  "read_files": [
+    "RAP1_IAA_30M_REP1.nonrna.1.fastq.gz",
+    "RAP1_IAA_30M_REP1.nonrna.2.fastq.gz"
+  ],
+  "expected_format": "ISR",
+  "compatible_fragment_ratio": 0.9923015319434757,
+  "num_compatible_fragments": 38411,
+  "num_incompatible_fragments": 298,
+  "num_assigned_fragments": 38411,
+  "num_frags_with_concordant_consistent_mappings": 36354,
+  "num_frags_with_inconsistent_or_orphan_mappings": 7366,
+  "strand_mapping_bias": 0.12162945781385909,
+  "IU": 0,
+  "ISF": 5034,
+  "ISR": 36354,
+  "OU": 0,
+  "OSF": 0,
+  "OSR": 0,
+  "MU": 0,
+  "MSF": 0,
+  "MSR": 0,
+  "U": 0,
+  "SF": 1237,
+  "SR": 1095
+}

@@ -1,0 +1,8 @@
+2026-10-22 09:44:38 : INFO  Using high MCC model
+2026-10-22 09:44:38 : INFO  Log file: WT_REP2.log
+2026-10-22 09:44:38 : INFO  Classify paired-end reads with chunk size [1m48[0m
+2026-10-22 09:44:38 : INFO  Writing output non-rRNA sequences into file: [94mWT_REP2.nonrna.1.fastq.gz, WT_REP2.nonrna.2.fastq.gz[0m
+2026-10-22 09:44:55 : INFO  [92m47961[0m sequences finished!
+2026-10-22 09:44:55 : INFO  Processed [1m[96m47961[0m sequences in total
+2026-10-22 09:44:55 : INFO  Detected [1m[96m47943[0m non-rRNA sequences
+2026-10-22 09:44:55 : INFO  Detected [1m[96m18[0m rRNA sequences

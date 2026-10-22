@@ -1,0 +1,26 @@
+{
+  "read_files": [
+    "WT_REP2.nonrna.1.fastq.gz",
+    "WT_REP2.nonrna.2.fastq.gz"
+  ],
+  "expected_format": "ISR",
+  "compatible_fragment_ratio": 0.9918071406135484,
+  "num_compatible_fragments": 37891,
+  "num_incompatible_fragments": 313,
+  "num_assigned_fragments": 37891,
+  "num_frags_with_concordant_consistent_mappings": 35618,
+  "num_frags_with_inconsistent_or_orphan_mappings": 7353,
+  "strand_mapping_bias": 0.11862813025833911,
+  "IU": 0,
+  "ISF": 4794,
+  "ISR": 35618,
+  "OU": 0,
+  "OSF": 0,
+  "OSR": 0,
+  "MU": 0,
+  "MSF": 0,
+  "MSR": 0,
+  "U": 0,
+  "SF": 1319,
+  "SR": 1240
+}

@@ -1,0 +1,9 @@
+Sample	Unique Reads	Duplicate Reads
+RAP1_IAA_30M_REP1_filtered_1.gz	15905.0	31915.0
+RAP1_IAA_30M_REP1_filtered_2.gz	15423.0	32397.0
+RAP1_UNINDUCED_REP1_filtered.gz	16396.0	32445.0
+RAP1_UNINDUCED_REP2_filtered.gz	25590.0	72341.0
+WT_REP1_filtered_1.gz	22314.0	73134.0
+WT_REP1_filtered_2.gz	22258.0	73190.0
+WT_REP2_filtered_1.gz	14903.0	33040.0
+WT_REP2_filtered_2.gz	15441.0	32502.0

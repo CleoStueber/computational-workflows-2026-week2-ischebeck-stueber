@@ -1,0 +1,19 @@
+{
+  "k": 31,
+  "m": 19,
+  "canonical": true,
+  "has_ec_table": true,
+  "num_refs": 125,
+  "first_decoy_index": 124,
+  "num_decoys": 1,
+  "index_version": 2,
+  "sshash_format_version": 5,
+  "keep_duplicates": false,
+  "salmon_version": "2.7.0",
+  "seq_hash": "7b4d749f53a65bf757f3aab9d5542d4d1f0a19e852788378ad6d00d2ffac7e0d",
+  "name_hash": "dc3d8a17a10e54b61c5a6999cb466b0e01819b641b918908899fd57ec55922e1",
+  "seq_hash512": "7e322a8817302850f4bafef09b94f7193f4e4c2718e0a8269f44cb43e356f260654684ed701022d81f1409bafe3386d3311a3fae652fc295041c996c54fa9bb8",
+  "name_hash512": "0e0aa14ad9fef2224de1f8fc4dac13c398f058bcfda5c817d17f19200af5b7ff55349e2068bb1082296b87504d9370792ae1f83f08c4768ca235b2c6d7de975e",
+  "decoy_seq_hash": "3c5c06b2ccb802798265a543cc6511d954a0a64a522c3f6af05be0553d6f0a62",
+  "decoy_name_hash": "a83dd0ccbffe39d071cc317ddf6e97f5c6b1c87af91919271f9fa140b0508c6c"
+}
