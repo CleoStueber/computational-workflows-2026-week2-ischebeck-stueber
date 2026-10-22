@@ -87,7 +87,7 @@ Each directory contains:
 <summary>Output files</summary>
 
 - `filter_gtf/`
-  - `filtered.gtf`: Annotation restricted to contigs present in the reference FASTA.
+  - `filtered.gtf`: Annotation filtered to retain records on contigs present in the reference FASTA that contain a `transcript_id` attribute, along with GTF comment lines.
 - `gffread/`
   - `reference.fasta`: Extracted transcript sequences.
 - `salmon_index/`
