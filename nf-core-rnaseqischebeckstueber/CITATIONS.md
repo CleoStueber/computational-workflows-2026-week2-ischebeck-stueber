@@ -14,6 +14,34 @@
 
 > Andrews, S. (2010). FastQC: A Quality Control Tool for High Throughput Sequence Data [Online].
 
+- [fastp](https://doi.org/10.1093/bioinformatics/bty560)
+
+> Shifu Chen, Yanqing Zhou, Yaru Chen, Jia Gu, fastp: an ultra-fast all-in-one FASTQ preprocessor, Bioinformatics, Volume 34, Issue 17, September 2018, Pages i884–i890, https://doi.org/10.1093/bioinformatics/bty560.
+
+- [RiboDetector](https://doi.org/10.1093/nar/gkac112)
+
+> Zhi-Luo Deng, Philipp C Münch, René Mreches, Alice C McHardy, Rapid and accurate identification of ribosomal RNA sequences via deep learning, Nucleic Acids Research, Volume 50, Issue 10, 10 June 2022, Page e60, https://doi.org/10.1093/nar/gkac112.
+
+- [GffRead](https://doi.org/10.12688/f1000research.23297.2)
+
+> Pertea G and Pertea M. GFF Utilities: GffRead and GffCompare [version 2; peer review: 3 approved]. F1000Research 2020, 9:304 (https://doi.org/10.12688/f1000research.23297.2)
+
+- [Salmon](https://doi.org/10.1038/nmeth.4197)
+
+> Patro, R., Duggal, G., Love, M. et al. Salmon provides fast and bias-aware quantification of transcript expression. Nat Methods 14, 417–419 (2017). https://doi.org/10.1038/nmeth.4197.
+
+- [tximport](https://doi.org/10.12688/f1000research.7563.2)
+
+> Soneson C, Love MI and Robinson MD. Differential analyses for RNA-seq: transcript-level estimates improve gene-level inferences [version 2; peer review: 2 approved]. F1000Research 2016, 4:1521 (https://doi.org/10.12688/f1000research.7563.2).
+
+- [tximeta](https://doi.org/10.1371/journal.pcbi.1007664)
+
+> Love MI, Soneson C, Hickey PF, Johnson LK, Pierce NT, et al. (2020) Tximeta: Reference sequence checksums for provenance identification in RNA-seq. PLOS Computational Biology 16(2): e1007664. https://doi.org/10.1371/journal.pcbi.1007664.
+
+- [SummarizedExperiment](https://doi.org/10.18129/B9.bioc.SummarizedExperiment)
+
+> Morgan M, Obenchain V, Hester J, Pagès H (2026). SummarizedExperiment: A container (S4 class) for matrix-like assays. doi:10.18129/B9.bioc.SummarizedExperiment. R package version 1.42.0, https://bioconductor.org/packages/SummarizedExperiment.
+
 - [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
 
 > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
