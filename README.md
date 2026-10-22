@@ -20,5 +20,6 @@ The pipeline can then be executed with a test profile using Nextflow:
 ```bash
 nextflow run . -profile test,docker --outdir <results>
 ```
+Example results generated with the pipeline are available in the [example_output](example_output/) directory.
 
 For detailed usage instructions, parameters, and outputs, see the **[pipeline documentation](nf-core-rnaseqischebeckstueber/README.md)**.
