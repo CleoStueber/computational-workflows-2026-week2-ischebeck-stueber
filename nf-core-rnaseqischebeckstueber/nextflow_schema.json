@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/nf-core/rnaseqischebeckstueber/master/nextflow_schema.json",
+    "$id": "https://raw.githubusercontent.com/CleoStueber/computational-workflows-2026-week2-ischebeck-stueber/main/nf-core-rnaseqischebeckstueber/nextflow_schema.json",
     "title": "nf-core/rnaseqischebeckstueber pipeline parameters",
     "description": "nf-core RNA-seq workflow for reproducible transcriptomic analysis.",
     "type": "object",
@@ -20,7 +20,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/rnaseqischebeckstueber/usage#samplesheet-input).",
+                    "help_text": "Before running the pipeline, create a comma-separated samplesheet (CSV) with a header row containing information about your samples. The columns `sample` and `fastq_1` are required, while `fastq_2` (for paired-end reads) and `strandedness` (`forward`, `reverse`, `unstranded`, or `auto`) are optional. Multiple sequencing runs belonging to the same sample must use the same sample ID and will be merged automatically. See the [samplesheet documentation](https://github.com/CleoStueber/computational-workflows-2026-week2-ischebeck-stueber/blob/main/nf-core-rnaseqischebeckstueber/docs/usage.md#samplesheet-input) for details and examples.",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -62,7 +62,7 @@
                     "mimetype": "text/plain",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. Provide a reference genome in FASTA format that matches the gene annotation file supplied with `--gtf`. The pipeline automatically generates transcript sequences using Gffread and builds a Salmon index for transcript quantification. No precomputed index is required.",
                     "fa_icon": "far fa-file-code"
                 },
                 "gtf": { 
